@@ -5,11 +5,16 @@ script_author("waldemar03 | Alim Akimov")
 script_version("1.75")
 
 local CURRENT_VERSION = 1.75
-local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
-local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
+local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/version.txt"
+local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/FastHelperAdm.lua"
 local SCRIPT_PATH = thisScript().path
 
+local updateChecked = false
+
 function checkUpdate()
+    if updateChecked then return end
+    updateChecked = true
+    
     -- Даем игре загрузиться
     wait(2000)
     
