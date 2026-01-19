@@ -1,8 +1,8 @@
--- FastHelperAdm v1.76 (ANSI, CP1251)
+-- FastHelperAdm v1.75 (ANSI, CP1251)
 -- јвто-команды через 15 сек после захода + кнопка-переключатель в меню + сохранение настроек + ¬ременное лидерство
 script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
-script_version("1.76")
+script_version("1.75")
 
 -- ===== —≈ ÷»я ј¬“ќ-ќЅЌќ¬Ћ≈Ќ»я (FIXED) =====
 local CURRENT_VERSION = tonumber(thisScript().version)
@@ -1141,7 +1141,7 @@ function imgui.OnDrawFrame()
             "v1.60 Ч јвто ѕожелание + ќтветы на –епорты + јвто-команды через 10 сек\n" ..
             "v1.70 Ч ƒобавлена выдача себе лидерки + ƒобавлено авто меропри€тие + ‘икс неких багов\n" ..
             "v1.75 Ч ƒобавлен јвто ќтбор и добавлен визуал дл€ меню\n" ..
-            "v1.76 Ч »справлено авто-обновление (стабильна€ работа с GitHub)"
+            "v1.75 Ч »справлено авто-обновление (стабильна€ работа с GitHub)"
         ))
     elseif selectedTab==10 then
         imgui.TextWrapped(u8"FastHelperAdm v"..thisScript().version.."\nјвтор: Alim Akimov\n@waldemar03")
