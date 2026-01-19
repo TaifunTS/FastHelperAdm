@@ -4,6 +4,7 @@ script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
 script_version("1.75")
 
+-- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ =====
 local CURRENT_VERSION = 1.75
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/version.txt"
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/FastHelperAdm.lua"
@@ -93,6 +94,7 @@ function checkUpdate()
         end
     )
 end
+-- ===== КОНЕЦ СЕКЦИИ АВТО-ОБНОВЛЕНИЯ =====
 
 -- ===== UTILS =====
 local function prettySum(a)
@@ -578,12 +580,12 @@ end
 
 -- ===== MAIN =====
 function main()
+    -- Проверка обновлений (один раз при старте)
+    checkUpdate()
+
     repeat wait(0) until isSampAvailable()
     sampRegisterChatCommand("plhelp",function() showMenu.v=not showMenu.v end)
     sampRegisterChatCommand("pl",cmd_pl)
-
-    -- запускаем проверку обновлений (ОДИН РАЗ!)
-    checkUpdate()
 
     -- метка захода
     loginTime = os.clock()
