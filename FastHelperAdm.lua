@@ -1,5 +1,3 @@
-[file name]: FastHelperAdm.lua
-[file content begin]
 -- FastHelperAdm v1.75 (ANSI, CP1251)
 -- Авто-команды через 15 сек после захода + кнопка-переключатель в меню + сохранение настроек + Временное лидерство
 script_name("FastHelperAdm")
@@ -1228,4 +1226,3 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
         end)
     end
 end
-[file content end]
