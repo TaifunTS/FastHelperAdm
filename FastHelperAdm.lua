@@ -1,100 +1,64 @@
--- FastHelperAdm v1.75 (ANSI, CP1251)
+-- FastHelperAdm v1.76 (ANSI, CP1251)
 -- Авто-команды через 15 сек после захода + кнопка-переключатель в меню + сохранение настроек + Временное лидерство
 script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
-script_version("1.75")
+script_version("1.76")
 
--- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ =====
-local CURRENT_VERSION = 1.75
-local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/version.txt"
-local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/refs/heads/main/FastHelperAdm.lua"
+-- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (FIXED) =====
+local CURRENT_VERSION = 1.76
+
+local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
+local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
+
 local SCRIPT_PATH = thisScript().path
-
 local updateChecked = false
 
 function checkUpdate()
     if updateChecked then return end
     updateChecked = true
-    
-    -- Даем игре загрузиться
-    wait(2000)
-    
-    -- Получаем директорию скрипта для сохранения временного файла
+
     local scriptDir = thisScript().path:match("(.+\\)")
     local tmpPath = scriptDir .. "version_tmp.txt"
-    
-    -- Скачиваем версию с GitHub
-    downloadUrlToFile(VERSION_URL, tmpPath,
-        function(id, status)
-            -- Статус 58 = загрузка завершена в MoonLoader
-            if status ~= 58 then 
-                -- Пытаемся удалить временный файл если он есть
-                if doesFileExist(tmpPath) then
-                    os.remove(tmpPath)
+
+    downloadUrlToFile(VERSION_URL, tmpPath, function(_, status)
+        if status ~= 58 then return end
+
+        local f = io.open(tmpPath, "r")
+        if not f then return end
+
+        local versionText = f:read("*l")
+        f:close()
+        os.remove(tmpPath)
+
+        if not versionText then return end
+
+        versionText = versionText:gsub("%s+", "")
+        local onlineVersion = tonumber(versionText)
+        if not onlineVersion then return end
+
+        if onlineVersion > CURRENT_VERSION then
+            sampAddChatMessage(
+                "{33CCFF}[FastHelperAdm] Найдено обновление v"..onlineVersion..
+                " (у вас v"..CURRENT_VERSION..")", -1
+            )
+
+            downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH, function(_, st)
+                if st == 58 then
+                    sampAddChatMessage(
+                        "{00FF00}[FastHelperAdm] Обновление установлено! Перезапустите игру.",
+                        -1
+                    )
                 end
-                sampAddChatMessage("{FF4444}[FastHelperAdm] Не удалось загрузить version.txt", -1)
-                return 
-            end
-            
-            -- Читаем версию из файла
-            local f = io.open(tmpPath, "r")
-            if not f then 
-                sampAddChatMessage("{FFA500}[FastHelperAdm] Не удалось прочитать version.txt", -1)
-                return 
-            end
-            
-            local versionText = f:read("*l")
-            f:close()
-            
-            -- Удаляем временный файл
-            os.remove(tmpPath)
-            
-            if not versionText then 
-                sampAddChatMessage("{FFA500}[FastHelperAdm] version.txt пустой", -1)
-                return 
-            end
-            
-            -- Очищаем версию от лишних символов
-            versionText = versionText:gsub("%s+", ""):gsub("v", ""):gsub("V", "")
-            local onlineVersion = tonumber(versionText)
-            
-            if not onlineVersion then 
-                sampAddChatMessage("{FFA500}[FastHelperAdm] Неверный формат версии: "..versionText, -1)
-                return 
-            end
-            
-            -- Сравниваем версии
-            if onlineVersion > CURRENT_VERSION then
-                sampAddChatMessage(
-                    "{33CCFF}[FastHelperAdm] Найдено обновление v"..onlineVersion.." (у вас v"..CURRENT_VERSION..")",
-                    -1
-                )
-                sampAddChatMessage(
-                    "{33CCFF}[FastHelperAdm] Начинаю загрузку обновления...",
-                    -1
-                )
-                
-                -- Скачиваем новый скрипт
-                downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH,
-                    function(id2, status2)
-                        if status2 ~= 58 then 
-                            sampAddChatMessage("{FF0000}[FastHelperAdm] Ошибка загрузки обновления", -1)
-                            return 
-                        end
-                        
-                        sampAddChatMessage(
-                            "{00FF00}[FastHelperAdm] Обновление установлено! Перезапустите игру.",
-                            -1
-                        )
-                    end
-                )
-            else
-                sampAddChatMessage("{00FF00}[FastHelperAdm] У вас актуальная версия v"..CURRENT_VERSION, -1)
-            end
+            end)
+        else
+            sampAddChatMessage(
+                "{00FF00}[FastHelperAdm] У вас актуальная версия v"..CURRENT_VERSION,
+                -1
+            )
         end
-    )
+    end)
 end
--- ===== КОНЕЦ СЕКЦИИ АВТО-ОБНОВЛЕНИЯ =====
+-- ===== КОНЕЦ АВТО-ОБНОВЛЕНИЯ =====
 
 -- ===== UTILS =====
 local function prettySum(a)
@@ -580,10 +544,9 @@ end
 
 -- ===== MAIN =====
 function main()
-    -- Проверка обновлений (один раз при старте)
-    checkUpdate()
-
     repeat wait(0) until isSampAvailable()
+    checkUpdate()
+    
     sampRegisterChatCommand("plhelp",function() showMenu.v=not showMenu.v end)
     sampRegisterChatCommand("pl",cmd_pl)
 
@@ -615,7 +578,7 @@ function main()
     sampAddChatMessage("{FF0000}========================================",-1)
     sampAddChatMessage("{00FF00}FastHelperAdm загружен",-1)
     sampAddChatMessage("{00FF00}Автор: Alim Akimov (@waldemar03)",-1)
-    sampAddChatMessage("{00FF00}Версия: v1.75",-1)
+    sampAddChatMessage("{00FF00}Версия: v1.76",-1)
     sampAddChatMessage("{FF0000}========================================",-1)
     sampAddChatMessage("{ADFF2F}Для открытия меню скрипта пропишите команду /plhelp",-1)
     sampAddChatMessage("{ADFF2F}Для использования скрипта пропишите команду /pl [id]",-1)
@@ -788,7 +751,7 @@ function imgui.OnDrawFrame()
     end
     
     imgui.SetNextWindowSize(imgui.ImVec2(760,440),imgui.Cond.FirstUseEver)
-    imgui.Begin(u8"FastHelperAdm v1.75",showMenu)
+    imgui.Begin(u8"FastHelperAdm v1.76",showMenu)
     
     imgui.Columns(2, "main_columns", false)
     imgui.SetColumnWidth(0,230)
@@ -1177,10 +1140,11 @@ function imgui.OnDrawFrame()
             "v1.55 — Фикс багов 2\n" ..
             "v1.60 — Авто Пожелание + Ответы на Репорты + Авто-команды через 10 сек\n" ..
             "v1.70 — Добавлена выдача себе лидерки + Добавлено авто мероприятие + Фикс неких багов\n" ..
-            "v1.75 — Добавлен Авто Отбор и добавлен визуал для меню"
+            "v1.75 — Добавлен Авто Отбор и добавлен визуал для меню\n" ..
+            "v1.76 — Исправлено авто-обновление (стабильная работа с GitHub)"
         ))
     elseif selectedTab==10 then
-        imgui.TextWrapped(u8"FastHelperAdm v1.75\nАвтор: Alim Akimov\n@waldemar03")
+        imgui.TextWrapped(u8"FastHelperAdm v1.76\nАвтор: Alim Akimov\n@waldemar03")
     end
 
     -- закрываем контейнер правой части
