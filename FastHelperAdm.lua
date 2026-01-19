@@ -5,7 +5,7 @@ script_author("waldemar03 | Alim Akimov")
 script_version("1.76")
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (FIXED) =====
-local CURRENT_VERSION = 1.76
+local CURRENT_VERSION = tonumber(thisScript().version)
 
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
@@ -578,7 +578,7 @@ function main()
     sampAddChatMessage("{FF0000}========================================",-1)
     sampAddChatMessage("{00FF00}FastHelperAdm загружен",-1)
     sampAddChatMessage("{00FF00}Автор: Alim Akimov (@waldemar03)",-1)
-    sampAddChatMessage("{00FF00}Версия: v1.76",-1)
+    sampAddChatMessage("{00FF00}Версия: v"..thisScript().version,-1)
     sampAddChatMessage("{FF0000}========================================",-1)
     sampAddChatMessage("{ADFF2F}Для открытия меню скрипта пропишите команду /plhelp",-1)
     sampAddChatMessage("{ADFF2F}Для использования скрипта пропишите команду /pl [id]",-1)
@@ -751,7 +751,7 @@ function imgui.OnDrawFrame()
     end
     
     imgui.SetNextWindowSize(imgui.ImVec2(760,440),imgui.Cond.FirstUseEver)
-    imgui.Begin(u8"FastHelperAdm v1.76",showMenu)
+    imgui.Begin(u8"FastHelperAdm v"..thisScript().version,showMenu)
     
     imgui.Columns(2, "main_columns", false)
     imgui.SetColumnWidth(0,230)
@@ -1144,7 +1144,7 @@ function imgui.OnDrawFrame()
             "v1.76 — Исправлено авто-обновление (стабильная работа с GitHub)"
         ))
     elseif selectedTab==10 then
-        imgui.TextWrapped(u8"FastHelperAdm v1.76\nАвтор: Alim Akimov\n@waldemar03")
+        imgui.TextWrapped(u8"FastHelperAdm v"..thisScript().version.."\nАвтор: Alim Akimov\n@waldemar03")
     end
 
     -- закрываем контейнер правой части
