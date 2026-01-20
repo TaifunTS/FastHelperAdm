@@ -5,6 +5,7 @@ script_author("waldemar03 | Alim Akimov")
 script_version("1.75")
 
 SCRIPT_VERSION = "1.75"
+SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
@@ -952,7 +953,9 @@ end
 
 -- Функция для вкладки "Об Авторе"
 local function drawTab10()
-    imgui.TextWrapped(u8"FastHelperAdm v"..SCRIPT_VERSION.."\nАвтор: Alim Akimov\n@waldemar03")
+    imgui.TextWrapped(
+        u8("FastHelperAdm v"..SCRIPT_VERSION.."\nАвтор: Alim Akimov\n@waldemar03")
+    )
 end
 
 -- Функция для отрисовки левой панели с вкладками
@@ -1082,7 +1085,11 @@ end
 -- ===== MAIN =====
 function main()
     repeat wait(0) until isSampAvailable()
-    checkUpdate()
+    
+    lua_thread.create(function()
+        wait(3000) -- даём чату прогрузиться
+        checkUpdate()
+    end)
     
     sampRegisterChatCommand("plhelp",function() showMenu.v=not showMenu.v end)
     sampRegisterChatCommand("pl",cmd_pl)
