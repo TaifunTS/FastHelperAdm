@@ -887,7 +887,7 @@ local function drawTab6()
             -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
             razdLocked = true
             active_razd = true
-            active_razd2 = false
+            active_razd2 = false  -- ?? ВАЖНО: сбрасываем при старте
             razdachaPrefixSent = false
             antiFlood = false
             razd_player_id = -1
@@ -1265,9 +1265,9 @@ function main()
             
             -- Проверяем подключение игрока
             if not sampIsPlayerConnected(razd_player_id) then
-                sampAddChatMessage('{FF4444}[AutoRazdacha] Игрок вышел, раздача отменена.',-1)
+                sampAddChatMessage('{FF5555}[FastHelperAdm] Победитель вышел, раздача отменена.',-1)
                 
-                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ при отмене
+                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПЕРЕД RETURN
                 razdLocked = false
                 antiFlood = false
                 active_razd = false
@@ -1275,7 +1275,7 @@ function main()
                 razd_player_id = -1
                 razdachaPrefixSent = false
                 startRazdachaFlag = false
-                return
+                return  -- ?? ТОЛЬКО ПОСЛЕ сброса
             end
             
             local idx = combo_priz.v + 1
