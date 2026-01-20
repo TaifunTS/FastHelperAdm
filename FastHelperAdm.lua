@@ -7,6 +7,8 @@ script_version("1.75")
 SCRIPT_VERSION = "1.75"
 SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
+local UPDATE_FLAG = getWorkingDirectory().."\\FastHelperAdm.update"
+
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
 local SCRIPT_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
@@ -53,21 +55,14 @@ function checkUpdate()
             -- ?? СКАЧИВАЕМ ВО ВРЕМЕННЫЙ ФАЙЛ .new
             downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
                 if st == 58 then
-                    -- ?? ЗАМЕНА ФАЙЛА
-                    local success, err = pcall(function()
-                        os.remove(SCRIPT_PATH)
-                        os.rename(SCRIPT_PATH..".new", SCRIPT_PATH)
-                    end)
-                    
-                    if success then
-                        sampAddChatMessage("{00FF00}[FastHelperAdm] Обновление установлено! Скрипт перезагружается...", -1)
-                        wait(500)
-                        thisScript():reload()
-                    else
-                        sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка при замене файла: "..tostring(err), -1)
-                    end
+                    local f = io.open(UPDATE_FLAG, "w")
+                    if f then f:write("1") f:close() end
+
+                    sampAddChatMessage("{00FF00}[FastHelperAdm] Обновление загружено. Перезапуск MoonLoader...", -1)
+                    wait(1000)
+                    sampSendChat("/reloadml")
                 else
-                    sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления (статус: "..tostring(st)..")", -1)
+                    sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
                 end
             end)
         else
@@ -1084,6 +1079,12 @@ end
 
 -- ===== MAIN =====
 function main()
+    if doesFileExist(UPDATE_FLAG) and doesFileExist(SCRIPT_PATH..".new") then
+        os.remove(UPDATE_FLAG)
+        os.remove(SCRIPT_PATH)
+        os.rename(SCRIPT_PATH..".new", SCRIPT_PATH)
+    end
+    
     repeat wait(0) until isSampAvailable()
     
     lua_thread.create(function()
