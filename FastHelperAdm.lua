@@ -4,8 +4,9 @@ script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
 script_version("1.75")
 
+SCRIPT_VERSION = "1.75"
+
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
-local SCRIPT_VERSION = "1.75"
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
 local SCRIPT_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local SCRIPT_PATH = thisScript().path
@@ -41,7 +42,11 @@ function checkUpdate()
         
         -- ?? СРАВНЕНИЕ СТРОК (НЕ tonumber)
         if online ~= SCRIPT_VERSION then
-            sampAddChatMessage("{33CCFF}[FastHelperAdm] Найдено обновление v"..online.." (у вас v"..SCRIPT_VERSION..")", -1)
+            sampAddChatMessage(string.format(
+                "{33CCFF}[FastHelperAdm] Найдено обновление v%s (у вас v%s)",
+                online,
+                SCRIPT_VERSION
+            ), -1)
             sampAddChatMessage("{33CCFF}[FastHelperAdm] Начинаю загрузку обновления...", -1)
             
             -- ?? СКАЧИВАЕМ ВО ВРЕМЕННЫЙ ФАЙЛ .new
@@ -874,7 +879,7 @@ local function drawTab7()
             for i, frac in ipairs(fractions) do
                 fractionNames[i] = u8(frac.name)
             end
-            imgui.Combo(u8"Лидерка", otbor_leader_combo, fractionNames, #fractions)
+            imgui.Combo(u8"Лидерки", otbor_leader_combo, fractionNames, #fractions)
         else
             -- Если вручную, показываем поле для ввода
             imgui.InputText(u8"Название лидерки", otbor_leader_name)
@@ -948,7 +953,7 @@ end
 
 -- Функция для вкладки "Об Авторе"
 local function drawTab10()
-    imgui.TextWrapped(u8"FastHelperAdm v"..CURRENT_VERSION.."\nАвтор: Alim Akimov\n@waldemar03")
+    imgui.TextWrapped(u8"FastHelperAdm v"..SCRIPT_VERSION.."\nАвтор: Alim Akimov\n@waldemar03")
 end
 
 -- Функция для отрисовки левой панели с вкладками
@@ -1059,7 +1064,7 @@ local function drawMainMenu()
     end
     
     imgui.SetNextWindowSize(imgui.ImVec2(760,440),imgui.Cond.FirstUseEver)
-    imgui.Begin(u8"FastHelperAdm v"..CURRENT_VERSION,showMenu)
+    imgui.Begin(u8"FastHelperAdm v"..SCRIPT_VERSION,showMenu)
     
     -- Отрисовка левой панели с вкладками
     drawLeftPanel()
@@ -1323,6 +1328,6 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
             wait(200)
             sampSendDialogResponse(id, 1, 0, "")
             otborRunning = false
-        end)
+        end
     end
 end
