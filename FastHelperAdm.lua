@@ -30,51 +30,57 @@ function checkUpdate()
             return
         end
 
-        local f = io.open(versionFile, "r")
-        if not f then
-            UPDATE_IN_PROGRESS = false
-            return
-        end
+        lua_thread.create(function()
+            wait(500) -- ?? КЛЮЧЕВО
 
-        local online = f:read("*l")
-        f:close()
-        os.remove(versionFile)
-
-        if not online or online == SCRIPT_VERSION then
-            UPDATE_IN_PROGRESS = false
-            return
-        end
-
-        sampAddChatMessage(
-            "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
-        )
-
-        if doesFileExist(NEW_PATH) then
-            os.remove(NEW_PATH)
-        end
-
-        downloadUrlToFile(SCRIPT_URL, NEW_PATH, function(_, st)
-            UPDATE_IN_PROGRESS = false
-
-            if st ~= 58 then
-                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
+            local f = io.open(versionFile, "r")
+            if not f then
+                UPDATE_IN_PROGRESS = false
                 return
             end
 
-            local nf = io.open(NEW_PATH, "r")
-            if not nf then return end
-            local head = nf:read(100)
-            nf:close()
+            local online = f:read("*l")
+            f:close()
+            os.remove(versionFile)
 
-            if head:find("<!DOCTYPE") then
-                os.remove(NEW_PATH)
-                sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub rate limit", -1)
+            if not online or online == SCRIPT_VERSION then
+                UPDATE_IN_PROGRESS = false
                 return
             end
 
             sampAddChatMessage(
-                "{00FF00}[FastHelperAdm] Обновление загружено. Перезапусти игру", -1
+                "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
             )
+
+            if doesFileExist(NEW_PATH) then
+                os.remove(NEW_PATH)
+            end
+
+            wait(500) -- ?? ОБЯЗАТЕЛЬНО
+
+            downloadUrlToFile(SCRIPT_URL, NEW_PATH, function(_, st)
+                UPDATE_IN_PROGRESS = false
+
+                if st ~= 58 then
+                    sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
+                    return
+                end
+
+                local nf = io.open(NEW_PATH, "r")
+                if not nf then return end
+                local head = nf:read(100)
+                nf:close()
+
+                if head:find("<!DOCTYPE") then
+                    os.remove(NEW_PATH)
+                    sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub вернул HTML", -1)
+                    return
+                end
+
+                sampAddChatMessage(
+                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапусти игру", -1
+                )
+            end)
         end)
     end)
 end
@@ -783,7 +789,7 @@ local function drawTab4()
     end
 end
 
--- Функция для вкладки "Авто Мероприятие"
+-- Функция для вкладке "Авто Мероприятие"
 local function drawTab5()
     -- Проверка доступа к вкладке Авто Мероприятие
     if adminLevel.v >= 9 then
