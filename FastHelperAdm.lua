@@ -4,7 +4,7 @@ script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
 script_version("1.75")
 
--- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (FIXED) =====
+-- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (ИСПРАВЛЕННАЯ) =====
 local CURRENT_VERSION = "1.75"
 
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
@@ -21,7 +21,13 @@ function checkUpdate()
     local tmpPath = scriptDir .. "version_tmp.txt"
 
     downloadUrlToFile(VERSION_URL, tmpPath, function(_, status)
-        if status ~= 58 then return end
+        if status ~= 58 then 
+            -- Очищаем временный файл если загрузка не удалась
+            if doesFileExist(tmpPath) then
+                os.remove(tmpPath)
+            end
+            return 
+        end
 
         local f = io.open(tmpPath, "r")
         if not f then return end
@@ -32,6 +38,7 @@ function checkUpdate()
 
         if not versionText then return end
 
+        -- ?? ФИКС №1: Убираем все пробелы и переносы строк перед сравнением
         versionText = versionText:gsub("%s+", "")
         
         -- Сравниваем версии как строки
@@ -40,15 +47,26 @@ function checkUpdate()
                 "{33CCFF}[FastHelperAdm] Найдено обновление v"..versionText..
                 " (у вас v"..CURRENT_VERSION..")", -1
             )
-
-            downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH, function(_, st)
+            sampAddChatMessage(
+                "{33CCFF}[FastHelperAdm] Начинаю загрузку обновления...", -1
+            )
+            
+            -- ?? ФИКС №2: Скачиваем во временный файл, а не в текущий
+            local TEMP_PATH = SCRIPT_PATH .. ".new"
+            
+            downloadUrlToFile(SCRIPT_URL, TEMP_PATH, function(_, st)
                 if st == 58 then
+                    -- Скачивание завершено успешно, применяем обновление
+                    applyUpdate(TEMP_PATH)
+                else
                     sampAddChatMessage(
-                        "{00FF00}[FastHelperAdm] Обновление установлено! Скрипт перезагружается...",
+                        "{FF4444}[FastHelperAdm] Ошибка загрузки обновления (статус: "..tostring(st)..")",
                         -1
                     )
-                    wait(500)
-                    thisScript():reload()
+                    -- Удаляем временный файл при ошибке
+                    if doesFileExist(TEMP_PATH) then
+                        os.remove(TEMP_PATH)
+                    end
                 end
             end)
         else
@@ -58,6 +76,52 @@ function checkUpdate()
             )
         end
     end)
+end
+
+-- ?? ФИКС №2: Функция применения обновления с использованием временного файла
+function applyUpdate(tempPath)
+    if not doesFileExist(tempPath) then
+        sampAddChatMessage(
+            "{FF4444}[FastHelperAdm] Ошибка: временный файл обновления не найден",
+            -1
+        )
+        return
+    end
+    
+    -- Закрываем все файловые дескрипторы
+    if io then io.flush() end
+    
+    -- Пытаемся удалить старый файл
+    local success, err = pcall(function()
+        os.remove(SCRIPT_PATH)
+    end)
+    
+    if not success then
+        sampAddChatMessage(
+            "{FF4444}[FastHelperAdm] Не могу удалить старый файл: "..tostring(err),
+            -1
+        )
+        -- Пытаемся переименовать поверх существующего
+        os.rename(tempPath, SCRIPT_PATH)
+    else
+        -- Переименовываем временный файл в основной
+        os.rename(tempPath, SCRIPT_PATH)
+    end
+    
+    -- Проверяем, что файл существует
+    if doesFileExist(SCRIPT_PATH) then
+        sampAddChatMessage(
+            "{00FF00}[FastHelperAdm] Обновление установлено! Скрипт перезагружается...",
+            -1
+        )
+        wait(1000)
+        thisScript():reload()
+    else
+        sampAddChatMessage(
+            "{FF4444}[FastHelperAdm] Критическая ошибка: файл скрипта не найден после обновления",
+            -1
+        )
+    end
 end
 -- ===== КОНЕЦ АВТО-ОБНОВЛЕНИЯ =====
 
