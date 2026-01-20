@@ -624,13 +624,13 @@ function doRazdacha()
         txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — "..pName.." "..prettySum(amount)
     end
     
-    -- Отправляем префикс только один раз для этой раздачи
-    if not razdachaPrefixSent then
-        local chatCmd = arr_chat[combo_chat.v + 1]
-        sampSendChat("/a z " .. chatCmd)
-        razdachaPrefixSent = true
-        wait(1000) -- КД 1 сек
-    end
+    -- ?? УДАЛЕНО: Не отправляем /a z aad для раздачи
+    -- if not razdachaPrefixSent then
+    --     local chatCmd = arr_chat[combo_chat.v + 1]
+    --     sampSendChat("/a z " .. chatCmd)
+    --     razdachaPrefixSent = true
+    --     wait(1000) -- КД 1 сек
+    -- end
     
     sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..txt)
     
@@ -781,12 +781,15 @@ function main()
             -- Проверяем подключение игрока
             if not sampIsPlayerConnected(razd_player_id) then
                 sampAddChatMessage('{FF4444}[AutoRazdacha] Игрок вышел, раздача отменена.',-1)
+                
+                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ при отмене
                 razdLocked = false
                 antiFlood = false
                 active_razd = false
                 active_razd2 = false
                 razd_player_id = -1
                 razdachaPrefixSent = false
+                startRazdachaFlag = false
                 return
             end
             
@@ -819,25 +822,26 @@ function main()
                 and ('WIN '..nick..'['..razd_player_id..'] стиль "'..prize..'"')
                 or  ('WIN '..nick..'['..razd_player_id..'] '..prize..' '..prettySum(amount))
             
-            -- Отправляем с префиксом для раздачи (только один раз для этой раздачи)
-            if not razdachaPrefixSent then
-                local chatCmd = arr_chat[combo_chat.v + 1]
-                sampSendChat("/a z " .. chatCmd)
-                razdachaPrefixSent = true
-                wait(1000) -- КД 1 сек
-            end
+            -- ?? УДАЛЕНО: Не отправляем /a z aad для раздачи
+            -- if not razdachaPrefixSent then
+            --     local chatCmd = arr_chat[combo_chat.v + 1]
+            --     sampSendChat("/a z " .. chatCmd)
+            --     razdachaPrefixSent = true
+            --     wait(1000) -- КД 1 сек
+            -- end
             
             sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..announce)
             
             addGuiLog(getMSKTime()..' | '..announce)
             
-            -- Сбрасываем все флаги раздачи
+            -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
             razdLocked = false
             active_razd = false
             active_razd2 = false
             antiFlood = false
             razd_player_id = -1
             razdachaPrefixSent = false
+            startRazdachaFlag = false
         end
     end
 end
@@ -1178,10 +1182,13 @@ function imgui.OnDrawFrame()
             end
             
             if imgui.Button(u8"Начать раздачу") and text_word.v~='' and not razdLocked then
-                razdLocked=true
-                active_razd=true
-                active_razd2=false
+                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
+                razdLocked = true
+                active_razd = true
+                active_razd2 = false
                 razdachaPrefixSent = false
+                antiFlood = false
+                razd_player_id = -1
                 startRazdachaFlag = true
             end
             
