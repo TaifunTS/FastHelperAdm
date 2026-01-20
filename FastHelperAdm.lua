@@ -11,29 +11,40 @@ local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/ma
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local SCRIPT_PATH = thisScript().path
 local UPDATE_FLAG = getWorkingDirectory().."\\FastHelperAdm.update"
+local UPDATE_IN_PROGRESS = false
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
 function checkUpdate()
+    if UPDATE_IN_PROGRESS then return end
+    UPDATE_IN_PROGRESS = true
+
     local tmpVersion = getWorkingDirectory().."\\FastHelperAdm.version"
 
     downloadUrlToFile(VERSION_URL, tmpVersion, function(_, status)
-        if status ~= 58 then 
-            if doesFileExist(tmpVersion) then
-                os.remove(tmpVersion)
-            end
-            return 
+        if status ~= 58 then
+            UPDATE_IN_PROGRESS = false
+            if doesFileExist(tmpVersion) then os.remove(tmpVersion) end
+            return
         end
 
         local f = io.open(tmpVersion, "r")
-        if not f then return end
+        if not f then
+            UPDATE_IN_PROGRESS = false
+            return
+        end
 
         local online = f:read("*a")
         f:close()
         os.remove(tmpVersion)
 
         online = online:gsub("%s+", "")
+
         if online == SCRIPT_VERSION then
-            sampAddChatMessage("{00FF00}[FastHelperAdm] У вас актуальная версия v"..SCRIPT_VERSION, -1)
+            sampAddChatMessage(
+                "{00FF00}[FastHelperAdm] У вас актуальная версия v"..SCRIPT_VERSION,
+                -1
+            )
+            UPDATE_IN_PROGRESS = false
             return
         end
 
@@ -44,16 +55,21 @@ function checkUpdate()
         sampAddChatMessage("{33CCFF}[FastHelperAdm] Загрузка обновления...", -1)
 
         downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
+            UPDATE_IN_PROGRESS = false
+
             if st == 58 then
                 local f = io.open(UPDATE_FLAG, "w")
                 if f then f:write("1") f:close() end
 
                 sampAddChatMessage(
-                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапустите игру или MoonLoader.",
+                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапустите игру.",
                     -1
                 )
             else
-                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
+                sampAddChatMessage(
+                    "{FF4444}[FastHelperAdm] Ошибка загрузки обновления",
+                    -1
+                )
             end
         end)
     end)
@@ -1076,7 +1092,8 @@ function main()
     repeat wait(0) until isSampAvailable()
     
     lua_thread.create(function()
-        wait(3000) -- даём чату прогрузиться
+        repeat wait(0) until isSampAvailable()
+        wait(3000)
         checkUpdate()
     end)
     
