@@ -12,10 +12,11 @@ local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/ma
 local SCRIPT_PATH = thisScript().path
 local UPDATE_FLAG = getWorkingDirectory().."\\FastHelperAdm.update"
 local UPDATE_IN_PROGRESS = false
+local UPDATE_CHECKED = false
 
--- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
+-- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (ИСПРАВЛЕННАЯ) =====
 function checkUpdate()
-    if UPDATE_IN_PROGRESS then return end
+    if UPDATE_IN_PROGRESS or UPDATE_CHECKED then return end
     UPDATE_IN_PROGRESS = true
 
     local tmpVersion = getWorkingDirectory().."\\FastHelperAdm.version"
@@ -23,13 +24,17 @@ function checkUpdate()
     downloadUrlToFile(VERSION_URL, tmpVersion, function(_, status)
         if status ~= 58 then
             UPDATE_IN_PROGRESS = false
-            if doesFileExist(tmpVersion) then os.remove(tmpVersion) end
+            UPDATE_CHECKED = true
+            if doesFileExist(tmpVersion) then 
+                os.remove(tmpVersion) 
+            end
             return
         end
 
         local f = io.open(tmpVersion, "r")
         if not f then
             UPDATE_IN_PROGRESS = false
+            UPDATE_CHECKED = true
             return
         end
 
@@ -45,6 +50,7 @@ function checkUpdate()
                 -1
             )
             UPDATE_IN_PROGRESS = false
+            UPDATE_CHECKED = true
             return
         end
 
@@ -56,10 +62,14 @@ function checkUpdate()
 
         downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
             UPDATE_IN_PROGRESS = false
+            UPDATE_CHECKED = true
 
             if st == 58 then
                 local f = io.open(UPDATE_FLAG, "w")
-                if f then f:write("1") f:close() end
+                if f then 
+                    f:write("1") 
+                    f:close() 
+                end
 
                 sampAddChatMessage(
                     "{00FF00}[FastHelperAdm] Обновление загружено. Перезапустите игру.",
@@ -842,7 +852,7 @@ local function drawTab6()
         end
         
         if imgui.Button(u8"Начать раздачу") and text_word.v~='' and not razdLocked then
-            -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
+            -- ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
             resetRazdacha()
             razdLocked = true
             active_razd = true
@@ -1083,18 +1093,24 @@ end
 
 -- ===== MAIN =====
 function main()
+    -- БЕЗОПАСНАЯ ОБРАБОТКА ОБНОВЛЕНИЙ
     if doesFileExist(UPDATE_FLAG) and doesFileExist(thisScript().path..".new") then
         os.remove(UPDATE_FLAG)
-        os.remove(thisScript().path)
-        os.rename(thisScript().path..".new", thisScript().path)
+        sampAddChatMessage(
+            "{00FF00}[FastHelperAdm] Обнаружено обновление. Перезапустите MoonLoader.",
+            -1
+        )
+        return
     end
     
     repeat wait(0) until isSampAvailable()
     
+    -- Запуск авто-обновления с задержкой и защитой от повторного вызова
     lua_thread.create(function()
-        repeat wait(0) until isSampAvailable()
-        wait(3000)
-        checkUpdate()
+        wait(5000) -- Задержка 5 секунд после загрузки
+        if not UPDATE_CHECKED then
+            checkUpdate()
+        end
     end)
     
     sampRegisterChatCommand("plhelp",function() showMenu.v=not showMenu.v end)
@@ -1270,7 +1286,7 @@ function main()
                 
                 addGuiLog(getMSKTime()..' | '..announce)
                 
-                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
+                -- ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
                 resetRazdacha()
             end
         end
