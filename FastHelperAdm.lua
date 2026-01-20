@@ -1327,6 +1327,6 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
             wait(200)
             sampSendDialogResponse(id, 1, 0, "")
             otborRunning = false
-        end
+        end)
     end
 end
