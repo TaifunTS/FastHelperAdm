@@ -10,61 +10,52 @@ SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local SCRIPT_PATH = thisScript().path
-local UPDATE_FLAG = getWorkingDirectory().."\\FastHelperAdm.update"
-local UPDATE_LOCK = false -- Блокировка повторного вызова автообновления
+local NEW_PATH    = SCRIPT_PATH .. ".new"
+local BACKUP_PATH = SCRIPT_PATH .. ".bak"
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
 function checkUpdate()
-    if UPDATE_LOCK then return end
-    UPDATE_LOCK = true
+    local tmp = getWorkingDirectory() .. "\\FastHelperAdm.version"
 
-    local tmpVersion = getWorkingDirectory().."\\FastHelperAdm.version"
+    downloadUrlToFile(VERSION_URL, tmp, function(_, status)
+        if status ~= 58 or not doesFileExist(tmp) then return end
 
-    downloadUrlToFile(VERSION_URL, tmpVersion, function(_, status)
-        if status ~= 58 then
-            if doesFileExist(tmpVersion) then os.remove(tmpVersion) end
-            return
-        end
-
-        local f = io.open(tmpVersion, "r")
+        local f = io.open(tmp, "r")
         if not f then return end
-
         local online = f:read("*l")
         f:close()
-        os.remove(tmpVersion)
+        os.remove(tmp)
 
         if not online then return end
         online = online:gsub("%s+", "")
 
         if online == SCRIPT_VERSION then
-            sampAddChatMessage(
-                "{00FF00}[FastHelperAdm] У вас актуальная версия v"..SCRIPT_VERSION,
-                -1
-            )
+            sampAddChatMessage("{00FF00}[FastHelperAdm] Версия актуальна ("..SCRIPT_VERSION..")", -1)
             return
         end
 
-        sampAddChatMessage(
-            "{33CCFF}[FastHelperAdm] Найдено обновление v"..online.." (у вас v"..SCRIPT_VERSION..")",
-            -1
-        )
-        sampAddChatMessage("{33CCFF}[FastHelperAdm] Загрузка обновления...", -1)
+        sampAddChatMessage("{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1)
+        sampAddChatMessage("{33CCFF}[FastHelperAdm] Загрузка...", -1)
 
-        downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
-            if st == 58 then
-                local f = io.open(UPDATE_FLAG, "w")
-                if f then f:write("1") f:close() end
-
-                sampAddChatMessage(
-                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапустите игру.",
-                    -1
-                )
-            else
-                sampAddChatMessage(
-                    "{FF4444}[FastHelperAdm] Ошибка загрузки обновления",
-                    -1
-                )
+        downloadUrlToFile(SCRIPT_URL, NEW_PATH, function(_, st)
+            if st ~= 58 then
+                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
+                return
             end
+
+            -- Проверка что файл не пустой и не HTML
+            local nf = io.open(NEW_PATH, "r")
+            if not nf then return end
+            local head = nf:read(100)
+            nf:close()
+
+            if not head or head:find("<!DOCTYPE") then
+                os.remove(NEW_PATH)
+                sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub вернул HTML, обновление отменено", -1)
+                return
+            end
+
+            sampAddChatMessage("{00FF00}[FastHelperAdm] Обновление загружено, перезапустите игру", -1)
         end)
     end)
 end
@@ -1079,17 +1070,19 @@ end
 
 -- ===== MAIN =====
 function main()
-    if doesFileExist(UPDATE_FLAG) and doesFileExist(thisScript().path..".new") then
-        os.remove(UPDATE_FLAG)
-        os.remove(thisScript().path)
-        os.rename(thisScript().path..".new", thisScript().path)
+    -- Безопасная замена файла при запуске
+    if doesFileExist(NEW_PATH) then
+        if doesFileExist(SCRIPT_PATH) then
+            os.rename(SCRIPT_PATH, BACKUP_PATH)
+        end
+        os.rename(NEW_PATH, SCRIPT_PATH)
     end
     
     repeat wait(0) until isSampAvailable()
     
     lua_thread.create(function()
         repeat wait(0) until isSampAvailable()
-        wait(3000)
+        wait(5000)
         checkUpdate()
     end)
     
