@@ -11,51 +11,70 @@ local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/ma
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local SCRIPT_PATH = thisScript().path
 local NEW_PATH    = SCRIPT_PATH .. ".new"
-local BACKUP_PATH = SCRIPT_PATH .. ".bak"
+local UPDATE_IN_PROGRESS = false
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
 function checkUpdate()
-    local tmp = getWorkingDirectory() .. "\\FastHelperAdm.version"
+    if UPDATE_IN_PROGRESS then return end
+    UPDATE_IN_PROGRESS = true
 
-    downloadUrlToFile(VERSION_URL, tmp, function(_, status)
-        if status ~= 58 or not doesFileExist(tmp) then return end
+    local versionFile = getWorkingDirectory() .. "\\FastHelperAdm.version"
 
-        local f = io.open(tmp, "r")
-        if not f then return end
-        local online = f:read("*l")
-        f:close()
-        os.remove(tmp)
+    if doesFileExist(versionFile) then
+        os.remove(versionFile)
+    end
 
-        if not online then return end
-        online = online:gsub("%s+", "")
-
-        if online == SCRIPT_VERSION then
-            sampAddChatMessage("{00FF00}[FastHelperAdm] Версия актуальна ("..SCRIPT_VERSION..")", -1)
+    downloadUrlToFile(VERSION_URL, versionFile, function(_, status)
+        if status ~= 58 then
+            UPDATE_IN_PROGRESS = false
             return
         end
 
-        sampAddChatMessage("{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1)
-        sampAddChatMessage("{33CCFF}[FastHelperAdm] Загрузка...", -1)
+        local f = io.open(versionFile, "r")
+        if not f then
+            UPDATE_IN_PROGRESS = false
+            return
+        end
+
+        local online = f:read("*l")
+        f:close()
+        os.remove(versionFile)
+
+        if not online or online == SCRIPT_VERSION then
+            UPDATE_IN_PROGRESS = false
+            return
+        end
+
+        sampAddChatMessage(
+            "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
+        )
+
+        if doesFileExist(NEW_PATH) then
+            os.remove(NEW_PATH)
+        end
 
         downloadUrlToFile(SCRIPT_URL, NEW_PATH, function(_, st)
+            UPDATE_IN_PROGRESS = false
+
             if st ~= 58 then
-                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
+                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
                 return
             end
 
-            -- Проверка что файл не пустой и не HTML
             local nf = io.open(NEW_PATH, "r")
             if not nf then return end
             local head = nf:read(100)
             nf:close()
 
-            if not head or head:find("<!DOCTYPE") then
+            if head:find("<!DOCTYPE") then
                 os.remove(NEW_PATH)
-                sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub вернул HTML, обновление отменено", -1)
+                sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub rate limit", -1)
                 return
             end
 
-            sampAddChatMessage("{00FF00}[FastHelperAdm] Обновление загружено, перезапустите игру", -1)
+            sampAddChatMessage(
+                "{00FF00}[FastHelperAdm] Обновление загружено. Перезапусти игру", -1
+            )
         end)
     end)
 end
@@ -1072,17 +1091,16 @@ end
 function main()
     -- Безопасная замена файла при запуске
     if doesFileExist(NEW_PATH) then
-        if doesFileExist(SCRIPT_PATH) then
-            os.rename(SCRIPT_PATH, BACKUP_PATH)
-        end
+        os.remove(SCRIPT_PATH)
         os.rename(NEW_PATH, SCRIPT_PATH)
     end
     
     repeat wait(0) until isSampAvailable()
     
+    -- Правильный вызов автообновления ТОЛЬКО ОДИН РАЗ
     lua_thread.create(function()
         repeat wait(0) until isSampAvailable()
-        wait(5000)
+        wait(8000)
         checkUpdate()
     end)
     
