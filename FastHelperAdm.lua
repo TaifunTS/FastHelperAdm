@@ -1,17 +1,17 @@
 -- FastHelperAdm v1.75 (ANSI, CP1251)
--- Авто-команды через 15 сек после захода + кнопка-переключатель в меню + сохранение настроек + Временное лидерство
+-- ГЂГўГІГ®-ГЄГ®Г¬Г Г­Г¤Г» Г·ГҐГ°ГҐГ§ 15 Г±ГҐГЄ ГЇГ®Г±Г«ГҐ Г§Г ГµГ®Г¤Г  + ГЄГ­Г®ГЇГЄГ -ГЇГҐГ°ГҐГЄГ«ГѕГ·Г ГІГҐГ«Гј Гў Г¬ГҐГ­Гѕ + Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ Г­Г Г±ГІГ°Г®ГҐГЄ + Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г«ГЁГ¤ГҐГ°Г±ГІГўГ®
 script_name("FastHelperAdm")
 script_author("waldemar03 | Alim Akimov")
-script_version("1.75")
+script_version("1.76")
 
-SCRIPT_VERSION = "1.75"
+SCRIPT_VERSION = "1.76"
 SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
 local script_path = thisScript().path
 local new_path = script_path .. ".new"
 local backup_path = script_path .. ".bak"
 
--- === ПРИМЕНЕНИЕ ОБНОВЛЕНИЯ ===
+-- === ГЏГђГ€ГЊГ…ГЌГ…ГЌГ€Г… ГЋГЃГЌГЋГ‚Г‹Г…ГЌГ€Гџ ===
 if doesFileExist(new_path) then
     if doesFileExist(backup_path) then
         os.remove(backup_path)
@@ -24,7 +24,7 @@ local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/ma
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local UPDATE_DONE = false
 
--- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ =====
+-- ===== Г‘Г…ГЉГ–Г€Гџ ГЂГ‚Г’ГЋ-ГЋГЃГЌГЋГ‚Г‹Г…ГЌГ€Гџ =====
 function checkUpdate()
     if UPDATE_DONE then return end
     UPDATE_DONE = true
@@ -48,7 +48,7 @@ function checkUpdate()
             if not online or online == SCRIPT_VERSION then return end
 
             sampAddChatMessage(
-                "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
+                "{33CCFF}[FastHelperAdm] ГЌГ Г©Г¤ГҐГ­Г® Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ v"..online, -1
             )
 
             if doesFileExist(new_path) then os.remove(new_path) end
@@ -56,18 +56,18 @@ function checkUpdate()
 
             downloadUrlToFile(SCRIPT_URL, new_path, function(_, st)
                 if st ~= 58 then
-                    sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
+                    sampAddChatMessage("{FF4444}[FastHelperAdm] ГЋГёГЁГЎГЄГ  Г§Г ГЈГ°ГіГ§ГЄГЁ", -1)
                     return
                 end
 
                 sampAddChatMessage(
-                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапусти игру", -1
+                    "{00FF00}[FastHelperAdm] ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ Г§Г ГЈГ°ГіГ¦ГҐГ­Г®. ГЏГҐГ°ГҐГ§Г ГЇГіГ±ГІГЁ ГЁГЈГ°Гі", -1
                 )
             end)
         end)
     end)
 end
--- ===== КОНЕЦ АВТО-ОБНОВЛЕНИЯ =====
+-- ===== ГЉГЋГЌГ…Г– ГЂГ‚Г’ГЋ-ГЋГЃГЌГЋГ‚Г‹Г…ГЌГ€Гџ =====
 
 -- ===== UTILS =====
 local function prettySum(a)
@@ -107,35 +107,35 @@ local styleApplied = false
 local lastSendTime = 0
 local cooldown = 1.0
 local fastCodes = {
-    o="Ожидайте",y="Уточните",go="Уже иду",hel="Помог",sg="Свободная группа",
-    non="Нет в сети",per="Передам",otk="Отказ",rp="РП путём",s="Слежу"
+    o="ГЋГ¦ГЁГ¤Г Г©ГІГҐ",y="Г“ГІГ®Г·Г­ГЁГІГҐ",go="Г“Г¦ГҐ ГЁГ¤Гі",hel="ГЏГ®Г¬Г®ГЈ",sg="Г‘ГўГ®ГЎГ®Г¤Г­Г Гї ГЈГ°ГіГЇГЇГ ",
+    non="ГЌГҐГІ Гў Г±ГҐГІГЁ",per="ГЏГҐГ°ГҐГ¤Г Г¬",otk="ГЋГІГЄГ Г§",rp="ГђГЏ ГЇГіГІВёГ¬",s="Г‘Г«ГҐГ¦Гі"
 }
 
--- ===== Уровень админ прав (по умолчанию уровень 1) =====
+-- ===== Г“Г°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­ ГЇГ°Г Гў (ГЇГ® ГіГ¬Г®Г«Г·Г Г­ГЁГѕ ГіГ°Г®ГўГҐГ­Гј 1) =====
 local adminLevel = imgui.ImInt(1)
 
 -- ===== TEMPLEADER FRACTIONS =====
 local fractions = {
     {id = 1, name = "LSPD"},
-    {id = 2, name = "ФБР"},
+    {id = 2, name = "Г”ГЃГђ"},
     {id = 3, name = "Army LS"},
-    {id = 4, name = "Больница ЛС"},
+    {id = 4, name = "ГЃГ®Г«ГјГ­ГЁГ¶Г  Г‹Г‘"},
     {id = 5, name = "LCN"},
     {id = 6, name = "Yakuza"},
-    {id = 7, name = "Мэрия"},
+    {id = 7, name = "ГЊГЅГ°ГЁГї"},
     {id = 12, name = "Ballas"},
     {id = 13, name = "Vagos"},
     {id = 14, name = "Russia Mafia"},
     {id = 15, name = "Grove"},
-    {id = 16, name = "Радиоцентр"},
+    {id = 16, name = "ГђГ Г¤ГЁГ®Г¶ГҐГ­ГІГ°"},
     {id = 17, name = "Aztec"},
     {id = 18, name = "Rifa"},
     {id = 23, name = "Xitman"},
     {id = 25, name = "SWAT"},
-    {id = 26, name = "АП"},
+    {id = 26, name = "ГЂГЏ"},
     {id = 27, name = "RCPD"},
     {id = 28, name = "Outlaws MC"},
-    {id = 29, name = "Верховный Суд"}
+    {id = 29, name = "Г‚ГҐГ°ГµГ®ГўГ­Г»Г© Г‘ГіГ¤"}
 }
 
 -- ===== AUTO-COMMANDS AFTER 10 SEC IN-GAME =====
@@ -144,9 +144,9 @@ local autoAgm        = imgui.ImBool(true)    -- /agm
 local autoChatsms    = imgui.ImBool(true)    -- /chatsms
 local autoChat       = imgui.ImBool(true)    -- /chat
 local autoTogphone   = imgui.ImBool(true)    -- /togphone
-local autoPanelOpen  = imgui.ImBool(false)   -- панель свёрнута / развёрнута
-local cmdExecuted    = false                 -- уже выполняли?
-local loginTime      = 0                     -- метка захода
+local autoPanelOpen  = imgui.ImBool(false)   -- ГЇГ Г­ГҐГ«Гј Г±ГўВёГ°Г­ГіГІГ  / Г°Г Г§ГўВёГ°Г­ГіГІГ 
+local cmdExecuted    = false                 -- ГіГ¦ГҐ ГўГ»ГЇГ®Г«Г­ГїГ«ГЁ?
+local loginTime      = 0                     -- Г¬ГҐГІГЄГ  Г§Г ГµГ®Г¤Г 
 
 -- ===== AUTO WISH =====
 local autoWishEnabled = imgui.ImBool(false)
@@ -194,9 +194,9 @@ local function doAction(r)
     if r.id == myID then
         local msg = u8:decode(replyBuffer.v)
         if selectedQuickAction == "SVGROUP" then
-            msg = "Уважаемый Игрок отправьте жалобу в нашу Свободную Группу @inferno_sv"
+            msg = "Г“ГўГ Г¦Г ГҐГ¬Г»Г© Г€ГЈГ°Г®ГЄ Г®ГІГЇГ°Г ГўГјГІГҐ Г¦Г Г«Г®ГЎГі Гў Г­Г ГёГі Г‘ГўГ®ГЎГ®Г¤Г­ГіГѕ ГѓГ°ГіГЇГЇГі @inferno_sv"
         end
-        sampAddChatMessage("{33CCFF}[Себе] " .. msg, -1)
+        sampAddChatMessage("{33CCFF}[Г‘ГҐГЎГҐ] " .. msg, -1)
         replyBuffer.v = ""
         selectedQuickAction = nil
         selectedReport = 0
@@ -204,7 +204,7 @@ local function doAction(r)
     end
 
     if not sampIsPlayerConnected(r.id) then
-        sampAddChatMessage("{FF4444}[FastHelperAdm] Игрок оффлайн — /pm не отправлен", -1)
+        sampAddChatMessage("{FF4444}[FastHelperAdm] Г€ГЈГ°Г®ГЄ Г®ГґГґГ«Г Г©Г­ вЂ” /pm Г­ГҐ Г®ГІГЇГ°Г ГўГ«ГҐГ­", -1)
         return
     end
 
@@ -238,10 +238,10 @@ local arr_chat = {'aad','o'}
 local combo_chat = imgui.ImInt(0)
 
 local arr_priz = {
-    u8'Уровень',u8'Законопослушность',u8'Материалы',u8'Убийства',
-    u8'Номер телефона',u8'EXP',u8'Деньги в банке',
-    u8'Деньги на мобиле',u8'Наличные деньги',u8'Аптечки',
-    u8'Бокс',u8'Kung-Fu',u8'KickBox',u8'Наркозависимость',u8'Наркотики'
+    u8'Г“Г°Г®ГўГҐГ­Гј',u8'Г‡Г ГЄГ®Г­Г®ГЇГ®Г±Г«ГіГёГ­Г®Г±ГІГј',u8'ГЊГ ГІГҐГ°ГЁГ Г«Г»',u8'Г“ГЎГЁГ©Г±ГІГўГ ',
+    u8'ГЌГ®Г¬ГҐГ° ГІГҐГ«ГҐГґГ®Г­Г ',u8'EXP',u8'Г„ГҐГ­ГјГЈГЁ Гў ГЎГ Г­ГЄГҐ',
+    u8'Г„ГҐГ­ГјГЈГЁ Г­Г  Г¬Г®ГЎГЁГ«ГҐ',u8'ГЌГ Г«ГЁГ·Г­Г»ГҐ Г¤ГҐГ­ГјГЈГЁ',u8'ГЂГЇГІГҐГ·ГЄГЁ',
+    u8'ГЃГ®ГЄГ±',u8'Kung-Fu',u8'KickBox',u8'ГЌГ Г°ГЄГ®Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГј',u8'ГЌГ Г°ГЄГ®ГІГЁГЄГЁ'
 }
 local prizStatId = {1,2,3,4,5,6,7,8,9,10,12,13,14,15,16}
 local combo_priz = imgui.ImInt(0)
@@ -249,17 +249,17 @@ local guiLog = {}
 
 -- ===== AUTO MP =====
 local mp_names = {
-    u8"Король Дигла",
-    u8"Русская Рулетка",
-    u8"Поливалка",
-    u8"Дерби",
-    u8"Снайпер",
+    u8"ГЉГ®Г°Г®Г«Гј Г„ГЁГЈГ«Г ",
+    u8"ГђГіГ±Г±ГЄГ Гї ГђГіГ«ГҐГІГЄГ ",
+    u8"ГЏГ®Г«ГЁГўГ Г«ГЄГ ",
+    u8"Г„ГҐГ°ГЎГЁ",
+    u8"Г‘Г­Г Г©ГЇГҐГ°",
     u8"Paint-Ball",
-    u8"Бой на Катанах"
+    u8"ГЃГ®Г© Г­Г  ГЉГ ГІГ Г­Г Гµ"
 }
 
 local combo_mp_name = imgui.ImInt(0)
-local mp_custom_name = imgui.ImBuffer(64) -- ручное название
+local mp_custom_name = imgui.ImBuffer(64) -- Г°ГіГ·Г­Г®ГҐ Г­Г Г§ГўГ Г­ГЁГҐ
 
 local mp_priz1 = imgui.ImInt(0)
 local mp_amount1 = imgui.ImBuffer(32)
@@ -268,33 +268,33 @@ local mp_second_priz = imgui.ImBool(false)
 local mp_priz2 = imgui.ImInt(0)
 local mp_amount2 = imgui.ImBuffer(32)
 
--- авто-логика /mp
+-- Г ГўГІГ®-Г«Г®ГЈГЁГЄГ  /mp
 local mpAutoStep = 0
-local mpPrefixSent = false  -- Отдельный флаг для MP
+local mpPrefixSent = false  -- ГЋГІГ¤ГҐГ«ГјГ­Г»Г© ГґГ«Г ГЈ Г¤Г«Гї MP
 
 -- ===== AUTO OTBOR =====
 local otbor_leader_name = imgui.ImBuffer(64)
 local otbor_chat = imgui.ImInt(1) -- 0 = /aad, 1 = /o
 local otborRunning = false
-local otborPrefixSent = false  -- Отдельный флаг для отбора
+local otborPrefixSent = false  -- ГЋГІГ¤ГҐГ«ГјГ­Г»Г© ГґГ«Г ГЈ Г¤Г«Гї Г®ГІГЎГ®Г°Г 
 
--- Для управления отображением полей
-local otbor_selectLeader = imgui.ImInt(0)  -- 0 = вручную, 1 = из списка
-local mp_selectEvent = imgui.ImInt(0)  -- 0 = вручную, 1 = из списка
+-- Г„Г«Гї ГіГЇГ°Г ГўГ«ГҐГ­ГЁГї Г®ГІГ®ГЎГ°Г Г¦ГҐГ­ГЁГҐГ¬ ГЇГ®Г«ГҐГ©
+local otbor_selectLeader = imgui.ImInt(0)  -- 0 = ГўГ°ГіГ·Г­ГіГѕ, 1 = ГЁГ§ Г±ГЇГЁГ±ГЄГ 
+local mp_selectEvent = imgui.ImInt(0)  -- 0 = ГўГ°ГіГ·Г­ГіГѕ, 1 = ГЁГ§ Г±ГЇГЁГ±ГЄГ 
 
--- Для выбора лидерки из списка
+-- Г„Г«Гї ГўГ»ГЎГ®Г°Г  Г«ГЁГ¤ГҐГ°ГЄГЁ ГЁГ§ Г±ГЇГЁГ±ГЄГ 
 local otbor_leader_combo = imgui.ImInt(0)
 
--- Для настроек меню
-local menuColor = imgui.ImInt(0) -- 0 = Красный, 1 = Зеленый, 2 = Синий, 3 = Оранжевый, 4 = Желтый, 5 = Голубой, 6 = Фиолетовый, 7 = Радужный
+-- Г„Г«Гї Г­Г Г±ГІГ°Г®ГҐГЄ Г¬ГҐГ­Гѕ
+local menuColor = imgui.ImInt(0) -- 0 = ГЉГ°Г Г±Г­Г»Г©, 1 = Г‡ГҐГ«ГҐГ­Г»Г©, 2 = Г‘ГЁГ­ГЁГ©, 3 = ГЋГ°Г Г­Г¦ГҐГўГ»Г©, 4 = Г†ГҐГ«ГІГ»Г©, 5 = ГѓГ®Г«ГіГЎГ®Г©, 6 = Г”ГЁГ®Г«ГҐГІГ®ГўГ»Г©, 7 = ГђГ Г¤ГіГ¦Г­Г»Г©
 
--- ===== ФЛАГИ ДЛЯ АСИНХРОННОЙ ОБРАБОТКИ =====
+-- ===== Г”Г‹ГЂГѓГ€ Г„Г‹Гџ ГЂГ‘Г€ГЌГ•ГђГЋГЌГЌГЋГ‰ ГЋГЃГђГЂГЃГЋГ’ГЉГ€ =====
 local startAutoMpFlag = false
 local startAutoOtborFlag = false
 local startRazdachaFlag = false
 local saveSettingsFlag = false
 
--- ===== ФУНКЦИЯ ДЛЯ ПОЛНОГО СБРОСА РАЗДАЧИ =====
+-- ===== Г”Г“ГЌГЉГ–Г€Гџ Г„Г‹Гџ ГЏГЋГ‹ГЌГЋГѓГЋ Г‘ГЃГђГЋГ‘ГЂ ГђГЂГ‡Г„ГЂГ—Г€ =====
 local function resetRazdacha()
     razdLocked = false
     active_razd = false
@@ -320,7 +320,7 @@ local function parseAmount(str)
     return v>10000000000 and nil or v
 end
 
--- ===== СТИЛИ =====
+-- ===== Г‘Г’Г€Г‹Г€ =====
 local function ApplyRedStyle()
     local style=imgui.GetStyle() local c=style.Colors
     style.WindowRounding=8 style.FrameRounding=6
@@ -354,7 +354,7 @@ local function ApplyBlueStyle()
     c[imgui.Col.ButtonActive] =imgui.ImVec4(0.25,0.25,0.95,1.00)
 end
 
--- ===== НОВЫЕ ЦВЕТА =====
+-- ===== ГЌГЋГ‚Г›Г… Г–Г‚Г…Г’ГЂ =====
 local function ApplyOrangeStyle()
     local style=imgui.GetStyle() local c=style.Colors
     style.WindowRounding=8 style.FrameRounding=6
@@ -399,7 +399,7 @@ local function ApplyPurpleStyle()
     c[imgui.Col.ButtonActive] =imgui.ImVec4(0.80,0.25,0.90,1.00)
 end
 
--- ===== РАДУЖНЫЙ СТИЛЬ (динамический) =====
+-- ===== ГђГЂГ„Г“Г†ГЌГ›Г‰ Г‘Г’Г€Г‹Гњ (Г¤ГЁГ­Г Г¬ГЁГ·ГҐГ±ГЄГЁГ©) =====
 local function ApplyRainbowStyle()
     local style = imgui.GetStyle()
     style.WindowRounding = 8
@@ -457,20 +457,20 @@ local function loadCfg()
     f:close()
 end
 
--- ===== ФУНКЦИЯ ЗАПУСКА МЕРОПРИЯТИЯ (асинхронная) =====
+-- ===== Г”Г“ГЌГЉГ–Г€Гџ Г‡ГЂГЏГ“Г‘ГЉГЂ ГЊГ…ГђГЋГЏГђГ€ГџГ’Г€Гџ (Г Г±ГЁГ­ГµГ°Г®Г­Г­Г Гї) =====
 function doAutoMP()
     local mpName
 
-    -- Определяем название мероприятия
+    -- ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г­Г Г§ГўГ Г­ГЁГҐ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГї
     if mp_selectEvent.v == 1 then
-        -- Из списка
+        -- Г€Г§ Г±ГЇГЁГ±ГЄГ 
         mpName = u8:decode(mp_names[combo_mp_name.v + 1])
     else
-        -- Вручную
+        -- Г‚Г°ГіГ·Г­ГіГѕ
         if mp_custom_name.v ~= "" then
             mpName = u8:decode(mp_custom_name.v)
         else
-            sampAddChatMessage("{FF4444}[MP] Укажите название мероприятия", -1)
+            sampAddChatMessage("{FF4444}[MP] Г“ГЄГ Г¦ГЁГІГҐ Г­Г Г§ГўГ Г­ГЁГҐ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГї", -1)
             return
         end
     end
@@ -479,7 +479,7 @@ function doAutoMP()
     local amount1 = parseAmount(mp_amount1.v)
 
     if not amount1 then
-        sampAddChatMessage("{FF4444}[MP] Неверное количество первого приза", -1)
+        sampAddChatMessage("{FF4444}[MP] ГЌГҐГўГҐГ°Г­Г®ГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЇГҐГ°ГўГ®ГЈГ® ГЇГ°ГЁГ§Г ", -1)
         return
     end
 
@@ -490,81 +490,81 @@ function doAutoMP()
         local amount2 = parseAmount(mp_amount2.v)
 
         if not amount2 then
-            sampAddChatMessage("{FF4444}[MP] Неверное количество второго приза", -1)
+            sampAddChatMessage("{FF4444}[MP] ГЌГҐГўГҐГ°Г­Г®ГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГўГІГ®Г°Г®ГЈГ® ГЇГ°ГЁГ§Г ", -1)
             return
         end
 
         prizText = prizText .. " + " .. priz2 .. " " .. prettySum(amount2)
     end
 
-    -- Сбрасываем флаг префикса для MP
+    -- Г‘ГЎГ°Г Г±Г»ГўГ ГҐГ¬ ГґГ«Г ГЈ ГЇГ°ГҐГґГЁГЄГ±Г  Г¤Г«Гї MP
     mpPrefixSent = false
     
-    -- Отправляем префикс только один раз для этой MP
+    -- ГЋГІГЇГ°Г ГўГ«ГїГҐГ¬ ГЇГ°ГҐГґГЁГЄГ± ГІГ®Г«ГјГЄГ® Г®Г¤ГЁГ­ Г°Г Г§ Г¤Г«Гї ГЅГІГ®Г© MP
     if not mpPrefixSent then
         sampSendChat("/a z aad")
         mpPrefixSent = true
-        wait(1000) -- КД 1 сек
+        wait(1000) -- ГЉГ„ 1 Г±ГҐГЄ
     end
     
-    -- Отправляем сообщения
-    sampSendChat('/aad MP | Уважаемые игроки, сейчас пройдет мероприятие "'..mpName..'"')
+    -- ГЋГІГЇГ°Г ГўГ«ГїГҐГ¬ Г±Г®Г®ГЎГ№ГҐГ­ГЁГї
+    sampSendChat('/aad MP | Г“ГўГ Г¦Г ГҐГ¬Г»ГҐ ГЁГЈГ°Г®ГЄГЁ, Г±ГҐГ©Г·Г Г± ГЇГ°Г®Г©Г¤ГҐГІ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ "'..mpName..'"')
     wait(1000)
-    sampSendChat('/aad MP | Приз: '..prizText)
+    sampSendChat('/aad MP | ГЏГ°ГЁГ§: '..prizText)
     wait(1000)
-    sampSendChat('/aad MP | Желающие /gomp')
+    sampSendChat('/aad MP | Г†ГҐГ«Г ГѕГ№ГЁГҐ /gomp')
     wait(1000)
 
     mpAutoStep = 1
     sampSendChat("/mp")
 end
 
--- ===== ФУНКЦИЯ ЗАПУСКА АВТО ОТБОРА (асинхронная) =====
+-- ===== Г”Г“ГЌГЉГ–Г€Гџ Г‡ГЂГЏГ“Г‘ГЉГЂ ГЂГ‚Г’ГЋ ГЋГ’ГЃГЋГђГЂ (Г Г±ГЁГ­ГµГ°Г®Г­Г­Г Гї) =====
 function doAutoOtbor()
     local leaderName
     
-    -- Определяем название лидерки
+    -- ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г­Г Г§ГўГ Г­ГЁГҐ Г«ГЁГ¤ГҐГ°ГЄГЁ
     if otbor_selectLeader.v == 1 then
-        -- Из списка
+        -- Г€Г§ Г±ГЇГЁГ±ГЄГ 
         leaderName = u8:decode(fractions[otbor_leader_combo.v + 1].name)
     else
-        -- Вручную
+        -- Г‚Г°ГіГ·Г­ГіГѕ
         leaderName = u8:decode(otbor_leader_name.v)
     end
 
     if leaderName == "" then
-        sampAddChatMessage("{FF4444}[Отбор] Укажите название лидерки", -1)
+        sampAddChatMessage("{FF4444}[ГЋГІГЎГ®Г°] Г“ГЄГ Г¦ГЁГІГҐ Г­Г Г§ГўГ Г­ГЁГҐ Г«ГЁГ¤ГҐГ°ГЄГЁ", -1)
         return
     end
 
-    -- Определяем команду чата
+    -- ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ ГЄГ®Г¬Г Г­Г¤Гі Г·Г ГІГ 
     local chatCmd = (otbor_chat.v == 0 and "aad" or "o")
     
-    -- Сбрасываем флаг префикса для отбора
+    -- Г‘ГЎГ°Г Г±Г»ГўГ ГҐГ¬ ГґГ«Г ГЈ ГЇГ°ГҐГґГЁГЄГ±Г  Г¤Г«Гї Г®ГІГЎГ®Г°Г 
     otborPrefixSent = false
 
-    -- Отправляем префикс только один раз для этого отбора
+    -- ГЋГІГЇГ°Г ГўГ«ГїГҐГ¬ ГЇГ°ГҐГґГЁГЄГ± ГІГ®Г«ГјГЄГ® Г®Г¤ГЁГ­ Г°Г Г§ Г¤Г«Гї ГЅГІГ®ГЈГ® Г®ГІГЎГ®Г°Г 
     if not otborPrefixSent then
         sampSendChat("/a z " .. chatCmd)
         otborPrefixSent = true
-        wait(1000) -- КД 1 сек
+        wait(1000) -- ГЉГ„ 1 Г±ГҐГЄ
     end
     
-    -- Отправляем сообщения
-    sampSendChat('/'..chatCmd..' ОТБОР | Сейчас пройдёт отбор на лидера "'..leaderName..'"')
-    wait(1000) -- КД 1 сек
+    -- ГЋГІГЇГ°Г ГўГ«ГїГҐГ¬ Г±Г®Г®ГЎГ№ГҐГ­ГЁГї
+    sampSendChat('/'..chatCmd..' ГЋГ’ГЃГЋГђ | Г‘ГҐГ©Г·Г Г± ГЇГ°Г®Г©Г¤ВёГІ Г®ГІГЎГ®Г° Г­Г  Г«ГЁГ¤ГҐГ°Г  "'..leaderName..'"')
+    wait(1000) -- ГЉГ„ 1 Г±ГҐГЄ
 
-    sampSendChat('/'..chatCmd..' ОТБОР | Критерий: 2+ часов на аккаунте, иметь вк')
-    wait(1000) -- КД 1 сек
+    sampSendChat('/'..chatCmd..' ГЋГ’ГЃГЋГђ | ГЉГ°ГЁГІГҐГ°ГЁГ©: 2+ Г·Г Г±Г®Гў Г­Г  Г ГЄГЄГ ГіГ­ГІГҐ, ГЁГ¬ГҐГІГј ГўГЄ')
+    wait(1000) -- ГЉГ„ 1 Г±ГҐГЄ
 
-    sampSendChat('/'..chatCmd..' ОТБОР | Желающий /gomp')
-    wait(1000) -- КД 1 сек
+    sampSendChat('/'..chatCmd..' ГЋГ’ГЃГЋГђ | Г†ГҐГ«Г ГѕГ№ГЁГ© /gomp')
+    wait(1000) -- ГЉГ„ 1 Г±ГҐГЄ
 
     otborRunning = true
     sampSendChat("/mp")
 end
 
--- ===== ФУНКЦИЯ ЗАПУСКА РАЗДАЧИ (асинхронная) =====
+-- ===== Г”Г“ГЌГЉГ–Г€Гџ Г‡ГЂГЏГ“Г‘ГЉГЂ ГђГЂГ‡Г„ГЂГ—Г€ (Г Г±ГЁГ­ГµГ°Г®Г­Г­Г Гї) =====
 function doRazdacha()
     local pName = u8:decode(arr_priz[combo_priz.v + 1])
     local isStyle = (combo_priz.v + 1 >= 11 and combo_priz.v + 1 <= 13)
@@ -572,52 +572,52 @@ function doRazdacha()
     local txt
     
     if isStyle then
-        txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — стиль \""..pName.."\""
+        txt = "ГђГЂГ‡Г„ГЂГ—ГЂ | ГЉГІГ® ГЇГҐГ°ГўГ»Г© Г­Г ГЇГЁГёГҐГІ /rep "..u8:decode(text_word.v).." вЂ” Г±ГІГЁГ«Гј \""..pName.."\""
     else
-        txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — "..pName.." "..prettySum(amount)
+        txt = "ГђГЂГ‡Г„ГЂГ—ГЂ | ГЉГІГ® ГЇГҐГ°ГўГ»Г© Г­Г ГЇГЁГёГҐГІ /rep "..u8:decode(text_word.v).." вЂ” "..pName.." "..prettySum(amount)
     end
     
     sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..txt)
     
-    -- Запускаем таймер для отслеживания ответов
+    -- Г‡Г ГЇГіГ±ГЄГ ГҐГ¬ ГІГ Г©Г¬ГҐГ° Г¤Г«Гї Г®ГІГ±Г«ГҐГ¦ГЁГўГ Г­ГЁГї Г®ГІГўГҐГІГ®Гў
     timer = os.clock()
 end
 
--- ===== ОТДЕЛЬНЫЕ ФУНКЦИИ ДЛЯ РАЗДЕЛЕНИЯ ВКЛАДОК =====
+-- ===== ГЋГ’Г„Г…Г‹ГњГЌГ›Г… Г”Г“ГЌГЉГ–Г€Г€ Г„Г‹Гџ ГђГЂГ‡Г„Г…Г‹Г…ГЌГ€Гџ Г‚ГЉГ‹ГЂГ„ГЋГЉ =====
 
--- Функция для вкладки "Основные команды"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЋГ±Г­Г®ГўГ­Г»ГҐ ГЄГ®Г¬Г Г­Г¤Г»"
 local function drawTab1()
-    imgui.TextWrapped(u8"Основные команды:\n/plhelp – открыть меню\n/pl [id] [код/текст]")
+    imgui.TextWrapped(u8"ГЋГ±Г­Г®ГўГ­Г»ГҐ ГЄГ®Г¬Г Г­Г¤Г»:\n/plhelp вЂ“ Г®ГІГЄГ°Г»ГІГј Г¬ГҐГ­Гѕ\n/pl [id] [ГЄГ®Г¤/ГІГҐГЄГ±ГІ]")
     imgui.Separator()
-    imgui.TextWrapped(u8"Быстрые коды:\no – Ожидайте\ny – Уточните\ngo – Уже иду\nhel – Помог\nsg – Свободная группа\nnon – Нет в сети\nper – Передам\notk – Отказ\nrp – РП путём\ns – Слежу")
+    imgui.TextWrapped(u8"ГЃГ»Г±ГІГ°Г»ГҐ ГЄГ®Г¤Г»:\no вЂ“ ГЋГ¦ГЁГ¤Г Г©ГІГҐ\ny вЂ“ Г“ГІГ®Г·Г­ГЁГІГҐ\ngo вЂ“ Г“Г¦ГҐ ГЁГ¤Гі\nhel вЂ“ ГЏГ®Г¬Г®ГЈ\nsg вЂ“ Г‘ГўГ®ГЎГ®Г¤Г­Г Гї ГЈГ°ГіГЇГЇГ \nnon вЂ“ ГЌГҐГІ Гў Г±ГҐГІГЁ\nper вЂ“ ГЏГҐГ°ГҐГ¤Г Г¬\notk вЂ“ ГЋГІГЄГ Г§\nrp вЂ“ ГђГЏ ГЇГіГІВёГ¬\ns вЂ“ Г‘Г«ГҐГ¦Гі")
     imgui.Separator()
-    imgui.TextWrapped(u8"Примеры:\n/pl 15 o\n/pl 15 Привет")
+    imgui.TextWrapped(u8"ГЏГ°ГЁГ¬ГҐГ°Г»:\n/pl 15 o\n/pl 15 ГЏГ°ГЁГўГҐГІ")
 end
 
--- Функция для вкладки "Настройки меню"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЌГ Г±ГІГ°Г®Г©ГЄГЁ Г¬ГҐГ­Гѕ"
 local function drawTab2()
-    imgui.Text(u8"Настройки Меню")
+    imgui.Text(u8"ГЌГ Г±ГІГ°Г®Г©ГЄГЁ ГЊГҐГ­Гѕ")
     imgui.Separator()
 
-    -- Настройки цвета
-    imgui.Text(u8"Цвет меню")
+    -- ГЌГ Г±ГІГ°Г®Г©ГЄГЁ Г¶ГўГҐГІГ 
+    imgui.Text(u8"Г–ГўГҐГІ Г¬ГҐГ­Гѕ")
     local colorChoices = {
-        u8"Красный", 
-        u8"Зеленый", 
-        u8"Синий", 
-        u8"Оранжевый", 
-        u8"Желтый", 
-        u8"Голубой", 
-        u8"Фиолетовый",
-        u8"Радужный"
+        u8"ГЉГ°Г Г±Г­Г»Г©", 
+        u8"Г‡ГҐГ«ГҐГ­Г»Г©", 
+        u8"Г‘ГЁГ­ГЁГ©", 
+        u8"ГЋГ°Г Г­Г¦ГҐГўГ»Г©", 
+        u8"Г†ГҐГ«ГІГ»Г©", 
+        u8"ГѓГ®Г«ГіГЎГ®Г©", 
+        u8"Г”ГЁГ®Г«ГҐГІГ®ГўГ»Г©",
+        u8"ГђГ Г¤ГіГ¦Г­Г»Г©"
     }
-    imgui.Combo(u8"Выберите цвет", menuColor, colorChoices, #colorChoices)
+    imgui.Combo(u8"Г‚Г»ГЎГҐГ°ГЁГІГҐ Г¶ГўГҐГІ", menuColor, colorChoices, #colorChoices)
 
     if menuColor.v == 7 then
-        imgui.TextColored(imgui.ImVec4(1,0,1,1), u8"? Радужный режим активен")
+        imgui.TextColored(imgui.ImVec4(1,0,1,1), u8"? ГђГ Г¤ГіГ¦Г­Г»Г© Г°ГҐГ¦ГЁГ¬ Г ГЄГІГЁГўГҐГ­")
     end
 
-    if imgui.Button(u8"Применить цвет") then
+    if imgui.Button(u8"ГЏГ°ГЁГ¬ГҐГ­ГЁГІГј Г¶ГўГҐГІ") then
         if menuColor.v == 0 then
             ApplyRedStyle()
         elseif menuColor.v == 1 then
@@ -635,35 +635,35 @@ local function drawTab2()
         elseif menuColor.v == 7 then
             ApplyRainbowStyle()
         end
-        styleApplied = false -- Сбрасываем флаг для применения стиля в следующем кадре
+        styleApplied = false -- Г‘ГЎГ°Г Г±Г»ГўГ ГҐГ¬ ГґГ«Г ГЈ Г¤Г«Гї ГЇГ°ГЁГ¬ГҐГ­ГҐГ­ГЁГї Г±ГІГЁГ«Гї Гў Г±Г«ГҐГ¤ГіГѕГ№ГҐГ¬ ГЄГ Г¤Г°ГҐ
     end
 
     imgui.Separator()
 
-    -- Настройка уровня админ прав
-    imgui.Text(u8"Уровень админ прав")
-    imgui.SliderInt(u8"Выберите уровень", adminLevel, 1, 14)
+    -- ГЌГ Г±ГІГ°Г®Г©ГЄГ  ГіГ°Г®ГўГ­Гї Г Г¤Г¬ГЁГ­ ГЇГ°Г Гў
+    imgui.Text(u8"Г“Г°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­ ГЇГ°Г Гў")
+    imgui.SliderInt(u8"Г‚Г»ГЎГҐГ°ГЁГІГҐ ГіГ°Г®ГўГҐГ­Гј", adminLevel, 1, 14)
 
     imgui.Spacing()
     if adminLevel.v >= 9 then
-        imgui.TextColored(imgui.ImVec4(0,1,0,1), u8"? Доступ ко всем вкладкам доступен")
+        imgui.TextColored(imgui.ImVec4(0,1,0,1), u8"? Г„Г®Г±ГІГіГЇ ГЄГ® ГўГ±ГҐГ¬ ГўГЄГ«Г Г¤ГЄГ Г¬ Г¤Г®Г±ГІГіГЇГҐГ­")
     else
-        imgui.TextColored(imgui.ImVec4(1,0.5,0,1), u8"? Доступ ограничен. Уровни 1-8 не могут использовать:")
-        imgui.Text(u8"• Авто-Мероприятие")
-        imgui.Text(u8"• Авто-Раздачу") 
-        imgui.Text(u8"• Авто-Отбор")
-        imgui.Text(u8"• Временное лидерство")
+        imgui.TextColored(imgui.ImVec4(1,0.5,0,1), u8"? Г„Г®Г±ГІГіГЇ Г®ГЈГ°Г Г­ГЁГ·ГҐГ­. Г“Г°Г®ГўГ­ГЁ 1-8 Г­ГҐ Г¬Г®ГЈГіГІ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ ГІГј:")
+        imgui.Text(u8"вЂў ГЂГўГІГ®-ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ")
+        imgui.Text(u8"вЂў ГЂГўГІГ®-ГђГ Г§Г¤Г Г·Гі") 
+        imgui.Text(u8"вЂў ГЂГўГІГ®-ГЋГІГЎГ®Г°")
+        imgui.Text(u8"вЂў Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г«ГЁГ¤ГҐГ°Г±ГІГўГ®")
     end
 
     imgui.Separator()
-    if imgui.Button(u8"Сохранить настройки") then
+    if imgui.Button(u8"Г‘Г®ГµГ°Г Г­ГЁГІГј Г­Г Г±ГІГ°Г®Г©ГЄГЁ") then
         saveSettingsFlag = true
     end
 end
 
--- Функция для вкладки "Ответы на Репорты"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЋГІГўГҐГІГ» Г­Г  ГђГҐГЇГ®Г°ГІГ»"
 local function drawTab3()
-    imgui.Text(u8"Активные репорты:")
+    imgui.Text(u8"ГЂГЄГІГЁГўГ­Г»ГҐ Г°ГҐГЇГ®Г°ГІГ»:")
     imgui.BeginChild("repList", imgui.ImVec2(0,150), true)
     for i, r in ipairs(reports) do
         local line = string.format("[%d] %s: %s", r.id, r.nick, r.text)
@@ -673,7 +673,7 @@ local function drawTab3()
     end
     imgui.EndChild()
     
-    if imgui.Button(u8"Очистить все") then
+    if imgui.Button(u8"ГЋГ·ГЁГ±ГІГЁГІГј ГўГ±ГҐ") then
         reports = {}
         selectedReport = 0
         replyBuffer.v = ""
@@ -685,76 +685,76 @@ local function drawTab3()
     
     if selectedReport > 0 and selectedReport <= #reports then
         local r = reports[selectedReport]
-        imgui.Text(u8"Ответ для "..r.nick.."["..r.id.."]:")
+        imgui.Text(u8"ГЋГІГўГҐГІ Г¤Г«Гї "..r.nick.."["..r.id.."]:")
         imgui.InputTextMultiline("##reply_text", replyBuffer, imgui.ImVec2(-1, 60))
         imgui.Separator()
-        imgui.Text(u8"Быстрые действия:")
+        imgui.Text(u8"ГЃГ»Г±ГІГ°Г»ГҐ Г¤ГҐГ©Г±ГІГўГЁГї:")
 
-        if imgui.Button(u8"Приятной игры") then
+        if imgui.Button(u8"ГЏГ°ГЁГїГІГ­Г®Г© ГЁГЈГ°Г»") then
             selectedQuickAction = nil
-            replyBuffer.v = u8:encode("Приятной Игры от Администратора <3")
+            replyBuffer.v = u8:encode("ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» Г®ГІ ГЂГ¤Г¬ГЁГ­ГЁГ±ГІГ°Г ГІГ®Г°Г  <3")
         end
         imgui.SameLine()
-        if imgui.Button(u8"Уточнить") then
+        if imgui.Button(u8"Г“ГІГ®Г·Г­ГЁГІГј") then
             selectedQuickAction = nil
-            replyBuffer.v = u8:encode("Уточните ситуацию подробнее | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Г“ГІГ®Г·Г­ГЁГІГҐ Г±ГЁГІГіГ Г¶ГЁГѕ ГЇГ®Г¤Г°Г®ГЎГ­ГҐГҐ | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
         imgui.SameLine()
-        if imgui.Button(u8"Спавн") then
+        if imgui.Button(u8"Г‘ГЇГ ГўГ­") then
             selectedQuickAction = "SPAWN"
-            replyBuffer.v = u8:encode("Вы успешно заспавнены | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Г‚Г» ГіГ±ГЇГҐГёГ­Г® Г§Г Г±ГЇГ ГўГ­ГҐГ­Г» | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
         imgui.SameLine()
-        if imgui.Button(u8"Слежка") then
+        if imgui.Button(u8"Г‘Г«ГҐГ¦ГЄГ ") then
             selectedQuickAction = "WATCH"
-            replyBuffer.v = u8:encode("Я слежу | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Гџ Г±Г«ГҐГ¦Гі | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
 
-        if imgui.Button(u8"Передать") then
+        if imgui.Button(u8"ГЏГҐГ°ГҐГ¤Г ГІГј") then
             selectedQuickAction = "TRANSFER"
-            replyBuffer.v = u8:encode("Ваш репорт успешно передан | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Г‚Г Гё Г°ГҐГЇГ®Г°ГІ ГіГ±ГЇГҐГёГ­Г® ГЇГҐГ°ГҐГ¤Г Г­ | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
         imgui.SameLine()
-        if imgui.Button(u8"Не ко мне") then
+        if imgui.Button(u8"ГЌГҐ ГЄГ® Г¬Г­ГҐ") then
             selectedQuickAction = nil
-            replyBuffer.v = u8:encode("Данный вопрос не относится к администрации | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Г„Г Г­Г­Г»Г© ГўГ®ГЇГ°Г®Г± Г­ГҐ Г®ГІГ­Г®Г±ГЁГІГ±Гї ГЄ Г Г¤Г¬ГЁГ­ГЁГ±ГІГ°Г Г¶ГЁГЁ | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
         imgui.SameLine()
-        if imgui.Button(u8"Не в сети") then
+        if imgui.Button(u8"ГЌГҐ Гў Г±ГҐГІГЁ") then
             selectedQuickAction = "OFFLINE"
-            replyBuffer.v = u8:encode("Указанный игрок не в сети | Приятной Игры <3")
+            replyBuffer.v = u8:encode("Г“ГЄГ Г§Г Г­Г­Г»Г© ГЁГЈГ°Г®ГЄ Г­ГҐ Гў Г±ГҐГІГЁ | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
         end
 
-        if imgui.Button(u8"Свободная Группа") then
+        if imgui.Button(u8"Г‘ГўГ®ГЎГ®Г¤Г­Г Гї ГѓГ°ГіГЇГЇГ ") then
             selectedQuickAction = "SVGROUP"
-            replyBuffer.v = u8:encode("Уважаемый Игрок отправьте жалобу в нашу Свободную Группу @inferno_sv")
+            replyBuffer.v = u8:encode("Г“ГўГ Г¦Г ГҐГ¬Г»Г© Г€ГЈГ°Г®ГЄ Г®ГІГЇГ°Г ГўГјГІГҐ Г¦Г Г«Г®ГЎГі Гў Г­Г ГёГі Г‘ГўГ®ГЎГ®Г¤Г­ГіГѕ ГѓГ°ГіГЇГЇГі @inferno_sv")
         end
 
-        if imgui.Button(u8"Отправить") then
+        if imgui.Button(u8"ГЋГІГЇГ°Г ГўГЁГІГј") then
             doAction(r)
         end
         imgui.SameLine()
-        if imgui.Button(u8"Закрыть репорт") then
+        if imgui.Button(u8"Г‡Г ГЄГ°Г»ГІГј Г°ГҐГЇГ®Г°ГІ") then
             table.remove(reports,selectedReport)
             selectedReport=0
             replyBuffer.v=""
             selectedQuickAction=nil
         end
     else
-        imgui.Text(u8"Выберите репорт из списка")
+        imgui.Text(u8"Г‚Г»ГЎГҐГ°ГЁГІГҐ Г°ГҐГЇГ®Г°ГІ ГЁГ§ Г±ГЇГЁГ±ГЄГ ")
     end
 end
 
--- Функция для вкладки "Полезные функции"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЏГ®Г«ГҐГ§Г­Г»ГҐ ГґГіГ­ГЄГ¶ГЁГЁ"
 local function drawTab4()
-    imgui.TextWrapped(u8"Полезные функции:")
+    imgui.TextWrapped(u8"ГЏГ®Г«ГҐГ§Г­Г»ГҐ ГґГіГ­ГЄГ¶ГЁГЁ:")
 
-    if imgui.Button(u8"Авто включение") then
+    if imgui.Button(u8"ГЂГўГІГ® ГўГЄГ«ГѕГ·ГҐГ­ГЁГҐ") then
         autoPanelOpen.v = not autoPanelOpen.v
     end
     if autoPanelOpen.v then
         imgui.Indent(15)
-        imgui.Checkbox(u8"Включить авто-выполнение", autoEnable)
+        imgui.Checkbox(u8"Г‚ГЄГ«ГѕГ·ГЁГІГј Г ГўГІГ®-ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ", autoEnable)
         if autoEnable.v then
             imgui.Checkbox(u8"/agm",      autoAgm)
             imgui.Checkbox(u8"/chatsms",  autoChatsms)
@@ -764,80 +764,80 @@ local function drawTab4()
         imgui.Unindent(15)
     end
 
-    imgui.Checkbox(u8"Авто Пожелание",autoWishEnabled)
+    imgui.Checkbox(u8"ГЂГўГІГ® ГЏГ®Г¦ГҐГ«Г Г­ГЁГҐ",autoWishEnabled)
     imgui.SameLine()
     if imgui.Button(u8" ? ") then end
     if imgui.IsItemHovered() then
-        imgui.SetTooltip(u8"Каждый час в Pay-Day отправляется /gg в чат")
+        imgui.SetTooltip(u8"ГЉГ Г¦Г¤Г»Г© Г·Г Г± Гў Pay-Day Г®ГІГЇГ°Г ГўГ«ГїГҐГІГ±Гї /gg Гў Г·Г ГІ")
     end
 end
 
--- Функция для вкладки "Авто Мероприятие"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЂГўГІГ® ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ"
 local function drawTab5()
-    -- Проверка доступа к вкладке Авто Мероприятие
+    -- ГЏГ°Г®ГўГҐГ°ГЄГ  Г¤Г®Г±ГІГіГЇГ  ГЄ ГўГЄГ«Г Г¤ГЄГҐ ГЂГўГІГ® ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ
     if adminLevel.v >= 9 then
-        imgui.Text(u8"Авто Мероприятие")
+        imgui.Text(u8"ГЂГўГІГ® ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ")
         imgui.Separator()
 
-        -- Выбор: вручную или из списка
-        imgui.Combo(u8"Выбор мероприятия", mp_selectEvent, {u8"Вручную", u8"Из списка"}, 2)
+        -- Г‚Г»ГЎГ®Г°: ГўГ°ГіГ·Г­ГіГѕ ГЁГ«ГЁ ГЁГ§ Г±ГЇГЁГ±ГЄГ 
+        imgui.Combo(u8"Г‚Г»ГЎГ®Г° Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГї", mp_selectEvent, {u8"Г‚Г°ГіГ·Г­ГіГѕ", u8"Г€Г§ Г±ГЇГЁГ±ГЄГ "}, 2)
 
-        -- Если выбрано из списка, показываем только его
+        -- Г…Г±Г«ГЁ ГўГ»ГЎГ°Г Г­Г® ГЁГ§ Г±ГЇГЁГ±ГЄГ , ГЇГ®ГЄГ Г§Г»ГўГ ГҐГ¬ ГІГ®Г«ГјГЄГ® ГҐГЈГ®
         if mp_selectEvent.v == 1 then
-            imgui.Combo(u8"Мероприятие", combo_mp_name, mp_names, #mp_names)
+            imgui.Combo(u8"ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ", combo_mp_name, mp_names, #mp_names)
         else
-            -- Если вручную, показываем поле для ввода
-            imgui.InputText(u8"Название мероприятия", mp_custom_name)
+            -- Г…Г±Г«ГЁ ГўГ°ГіГ·Г­ГіГѕ, ГЇГ®ГЄГ Г§Г»ГўГ ГҐГ¬ ГЇГ®Г«ГҐ Г¤Г«Гї ГўГўГ®Г¤Г 
+            imgui.InputText(u8"ГЌГ Г§ГўГ Г­ГЁГҐ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГї", mp_custom_name)
         end
 
         imgui.Separator()
-        imgui.Text(u8"Приз 1")
-        imgui.Combo(u8"Приз##1", mp_priz1, arr_priz, #arr_priz)
-        imgui.InputText(u8"Количество##1", mp_amount1)
+        imgui.Text(u8"ГЏГ°ГЁГ§ 1")
+        imgui.Combo(u8"ГЏГ°ГЁГ§##1", mp_priz1, arr_priz, #arr_priz)
+        imgui.InputText(u8"ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ®##1", mp_amount1)
 
         imgui.Separator()
-        imgui.Checkbox(u8"Добавить второй приз", mp_second_priz)
+        imgui.Checkbox(u8"Г„Г®ГЎГ ГўГЁГІГј ГўГІГ®Г°Г®Г© ГЇГ°ГЁГ§", mp_second_priz)
 
         if mp_second_priz.v then
-            imgui.Text(u8"Приз 2")
-            imgui.Combo(u8"Приз##2", mp_priz2, arr_priz, #arr_priz)
-            imgui.InputText(u8"Количество##2", mp_amount2)
+            imgui.Text(u8"ГЏГ°ГЁГ§ 2")
+            imgui.Combo(u8"ГЏГ°ГЁГ§##2", mp_priz2, arr_priz, #arr_priz)
+            imgui.InputText(u8"ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ®##2", mp_amount2)
         end
 
         imgui.Separator()
-        if imgui.Button(u8"Начать мероприятие", imgui.ImVec2(260, 32)) then
+        if imgui.Button(u8"ГЌГ Г·Г ГІГј Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ", imgui.ImVec2(260, 32)) then
             startAutoMpFlag = true
         end
     else
-        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
-        imgui.Text(u8"Для доступа к этой функции требуется уровень админ-прав 9 или выше.")
+        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Г„Г®Г±ГІГіГЇ Г§Г ГЇГ°ГҐГ№ГҐГ­!")
+        imgui.Text(u8"Г„Г«Гї Г¤Г®Г±ГІГіГЇГ  ГЄ ГЅГІГ®Г© ГґГіГ­ГЄГ¶ГЁГЁ ГІГ°ГҐГЎГіГҐГІГ±Гї ГіГ°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­-ГЇГ°Г Гў 9 ГЁГ«ГЁ ГўГ»ГёГҐ.")
     end
 end
 
--- Функция для вкладки "Авто Раздача"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЂГўГІГ® ГђГ Г§Г¤Г Г·Г "
 local function drawTab6()
-    -- Проверка доступа к вкладке Авто Раздача
+    -- ГЏГ°Г®ГўГҐГ°ГЄГ  Г¤Г®Г±ГІГіГЇГ  ГЄ ГўГЄГ«Г Г¤ГЄГҐ ГЂГўГІГ® ГђГ Г§Г¤Г Г·Г 
     if adminLevel.v >= 9 then
-        imgui.Combo(u8"Чат",combo_chat,arr_chat,#arr_chat)
-        imgui.InputText(u8"Слово для /rep",text_word)
-        imgui.Combo(u8"Приз",combo_priz,arr_priz,#arr_priz)
+        imgui.Combo(u8"Г—Г ГІ",combo_chat,arr_chat,#arr_chat)
+        imgui.InputText(u8"Г‘Г«Г®ГўГ® Г¤Г«Гї /rep",text_word)
+        imgui.Combo(u8"ГЏГ°ГЁГ§",combo_priz,arr_priz,#arr_priz)
         
         local isStyle=(combo_priz.v+1>=11 and combo_priz.v+1<=13)
         local amount = isStyle and 50000 or (parseAmount(text_real.v) or 0)
         
         if not isStyle then
-            imgui.InputText(u8"Количество",text_real)
+            imgui.InputText(u8"ГЉГ®Г«ГЁГ·ГҐГ±ГІГўГ®",text_real)
             if amount > 0 then
-                imgui.Text(u8"В чате: "..prettySum(amount))
+                imgui.Text(u8"Г‚ Г·Г ГІГҐ: "..prettySum(amount))
             else
-                imgui.TextColored(imgui.ImVec4(1,0.3,0.3,1),u8"Пример: 5k / 5kk / 5kkk")
+                imgui.TextColored(imgui.ImVec4(1,0.3,0.3,1),u8"ГЏГ°ГЁГ¬ГҐГ°: 5k / 5kk / 5kkk")
             end
         else
-            imgui.TextDisabled(u8"Будет выдан стиль боя")
+            imgui.TextDisabled(u8"ГЃГіГ¤ГҐГІ ГўГ»Г¤Г Г­ Г±ГІГЁГ«Гј ГЎГ®Гї")
         end
         
-        if imgui.Button(u8"Начать раздачу") and text_word.v~='' and not razdLocked then
-            -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
+        if imgui.Button(u8"ГЌГ Г·Г ГІГј Г°Г Г§Г¤Г Г·Гі") and text_word.v~='' and not razdLocked then
+            -- ?? ГЏГЋГ‹ГЌГ›Г‰ Г‘ГЃГђГЋГ‘ Г”Г‹ГЂГѓГЋГ‚ ГЏГђГ€ ГЌГЋГ‚ГЋГ‰ ГђГЂГ‡Г„ГЂГ—Г…
             resetRazdacha()
             razdLocked = true
             active_razd = true
@@ -847,58 +847,58 @@ local function drawTab6()
         end
         
         imgui.Separator()
-        imgui.Text(u8"Последние раздачи:")
+        imgui.Text(u8"ГЏГ®Г±Г«ГҐГ¤Г­ГЁГҐ Г°Г Г§Г¤Г Г·ГЁ:")
         imgui.BeginChild('log',imgui.ImVec2(0,110),true)
         for _,v in ipairs(guiLog) do imgui.Text(v) end
         imgui.EndChild()
     else
-        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
-        imgui.Text(u8"Для доступа к этой функции требуется уровень админ-прав 9 или выше.")
+        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Г„Г®Г±ГІГіГЇ Г§Г ГЇГ°ГҐГ№ГҐГ­!")
+        imgui.Text(u8"Г„Г«Гї Г¤Г®Г±ГІГіГЇГ  ГЄ ГЅГІГ®Г© ГґГіГ­ГЄГ¶ГЁГЁ ГІГ°ГҐГЎГіГҐГІГ±Гї ГіГ°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­-ГЇГ°Г Гў 9 ГЁГ«ГЁ ГўГ»ГёГҐ.")
     end
 end
 
--- Функция для вкладки "Авто Отбор"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЂГўГІГ® ГЋГІГЎГ®Г°"
 local function drawTab7()
-    -- Проверка доступа к вкладке Авто Отбор
+    -- ГЏГ°Г®ГўГҐГ°ГЄГ  Г¤Г®Г±ГІГіГЇГ  ГЄ ГўГЄГ«Г Г¤ГЄГҐ ГЂГўГІГ® ГЋГІГЎГ®Г°
     if adminLevel.v >= 9 then
-        imgui.Text(u8"Авто Отбор на Лидера")
+        imgui.Text(u8"ГЂГўГІГ® ГЋГІГЎГ®Г° Г­Г  Г‹ГЁГ¤ГҐГ°Г ")
         imgui.Separator()
 
-        -- Выбор: вручную или из списка
-        imgui.Combo(u8"Выбор лидерки", otbor_selectLeader, {u8"Вручную", u8"Из списка"}, 2)
+        -- Г‚Г»ГЎГ®Г°: ГўГ°ГіГ·Г­ГіГѕ ГЁГ«ГЁ ГЁГ§ Г±ГЇГЁГ±ГЄГ 
+        imgui.Combo(u8"Г‚Г»ГЎГ®Г° Г«ГЁГ¤ГҐГ°ГЄГЁ", otbor_selectLeader, {u8"Г‚Г°ГіГ·Г­ГіГѕ", u8"Г€Г§ Г±ГЇГЁГ±ГЄГ "}, 2)
 
-        -- Если выбрано из списка, показываем только его
+        -- Г…Г±Г«ГЁ ГўГ»ГЎГ°Г Г­Г® ГЁГ§ Г±ГЇГЁГ±ГЄГ , ГЇГ®ГЄГ Г§Г»ГўГ ГҐГ¬ ГІГ®Г«ГјГЄГ® ГҐГЈГ®
         if otbor_selectLeader.v == 1 then
-            -- Создаем массив только с именами фракций для выпадающего списка
+            -- Г‘Г®Г§Г¤Г ГҐГ¬ Г¬Г Г±Г±ГЁГў ГІГ®Г«ГјГЄГ® Г± ГЁГ¬ГҐГ­Г Г¬ГЁ ГґГ°Г ГЄГ¶ГЁГ© Г¤Г«Гї ГўГ»ГЇГ Г¤Г ГѕГ№ГҐГЈГ® Г±ГЇГЁГ±ГЄГ 
             local fractionNames = {}
             for i, frac in ipairs(fractions) do
                 fractionNames[i] = u8(frac.name)
             end
-            imgui.Combo(u8"Лидерки", otbor_leader_combo, fractionNames, #fractions)
+            imgui.Combo(u8"Г‹ГЁГ¤ГҐГ°ГЄГЁ", otbor_leader_combo, fractionNames, #fractions)
         else
-            -- Если вручную, показываем поле для ввода
-            imgui.InputText(u8"Название лидерки", otbor_leader_name)
+            -- Г…Г±Г«ГЁ ГўГ°ГіГ·Г­ГіГѕ, ГЇГ®ГЄГ Г§Г»ГўГ ГҐГ¬ ГЇГ®Г«ГҐ Г¤Г«Гї ГўГўГ®Г¤Г 
+            imgui.InputText(u8"ГЌГ Г§ГўГ Г­ГЁГҐ Г«ГЁГ¤ГҐГ°ГЄГЁ", otbor_leader_name)
         end
 
-        -- Выбор чата
-        imgui.Combo(u8"Чат", otbor_chat, {u8"/aad", u8"/o"}, 2)
+        -- Г‚Г»ГЎГ®Г° Г·Г ГІГ 
+        imgui.Combo(u8"Г—Г ГІ", otbor_chat, {u8"/aad", u8"/o"}, 2)
 
         imgui.Separator()
-        if imgui.Button(u8"Начать Отбор", imgui.ImVec2(260, 32)) then
+        if imgui.Button(u8"ГЌГ Г·Г ГІГј ГЋГІГЎГ®Г°", imgui.ImVec2(260, 32)) then
             startAutoOtborFlag = true
         end
     else
-        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
-        imgui.Text(u8"Для доступа к этой функции требуется уровень админ-прав 9 или выше.")
+        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Г„Г®Г±ГІГіГЇ Г§Г ГЇГ°ГҐГ№ГҐГ­!")
+        imgui.Text(u8"Г„Г«Гї Г¤Г®Г±ГІГіГЇГ  ГЄ ГЅГІГ®Г© ГґГіГ­ГЄГ¶ГЁГЁ ГІГ°ГҐГЎГіГҐГІГ±Гї ГіГ°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­-ГЇГ°Г Гў 9 ГЁГ«ГЁ ГўГ»ГёГҐ.")
     end
 end
 
--- Функция для вкладки "Временное Лидерство"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г‹ГЁГ¤ГҐГ°Г±ГІГўГ®"
 local function drawTab8()
-    -- Проверка доступа к вкладке Временное Лидерство
+    -- ГЏГ°Г®ГўГҐГ°ГЄГ  Г¤Г®Г±ГІГіГЇГ  ГЄ ГўГЄГ«Г Г¤ГЄГҐ Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г‹ГЁГ¤ГҐГ°Г±ГІГўГ®
     if adminLevel.v >= 9 then
-        imgui.TextWrapped(u8"Временное Лидерство")
-        imgui.TextWrapped(u8"Нажмите на кнопку с названием фракции\nчтобы выдать себе временное лидерство")
+        imgui.TextWrapped(u8"Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г‹ГЁГ¤ГҐГ°Г±ГІГўГ®")
+        imgui.TextWrapped(u8"ГЌГ Г¦Г¬ГЁГІГҐ Г­Г  ГЄГ­Г®ГЇГЄГі Г± Г­Г Г§ГўГ Г­ГЁГҐГ¬ ГґГ°Г ГЄГ¶ГЁГЁ\nГ·ГІГ®ГЎГ» ГўГ»Г¤Г ГІГј Г±ГҐГЎГҐ ГўГ°ГҐГ¬ГҐГ­Г­Г®ГҐ Г«ГЁГ¤ГҐГ°Г±ГІГўГ®")
         imgui.Separator()
         
         local half = math.ceil(#fractions / 2)
@@ -926,76 +926,76 @@ local function drawTab8()
         
         imgui.EndChild()
     else
-        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
-        imgui.Text(u8"Для доступа к этой функции требуется уровень админ-прав 9 или выше.")
+        imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Г„Г®Г±ГІГіГЇ Г§Г ГЇГ°ГҐГ№ГҐГ­!")
+        imgui.Text(u8"Г„Г«Гї Г¤Г®Г±ГІГіГЇГ  ГЄ ГЅГІГ®Г© ГґГіГ­ГЄГ¶ГЁГЁ ГІГ°ГҐГЎГіГҐГІГ±Гї ГіГ°Г®ГўГҐГ­Гј Г Г¤Г¬ГЁГ­-ГЇГ°Г Гў 9 ГЁГ«ГЁ ГўГ»ГёГҐ.")
     end
 end
 
--- Функция для вкладки "Обновления"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГї"
 local function drawTab9()
     imgui.TextWrapped(u8(
-        "v1.0 — Релиз\n" ..
-        "v1.2 — Фикс багов\n" ..
-        "v1.4 — Улучшения\n" ..
-        "v1.5 — Авто Раздача\n" ..
-        "v1.55 — Фикс багов 2\n" ..
-        "v1.60 — Авто Пожелание + Ответы на Репорты + Авто-команды через 10 сек\n" ..
-        "v1.70 — Добавлена выдача себе лидерки + Добавлено авто мероприятие + Фикс неких багов\n" ..
-        "v1.75 — Добавлен Авто Отбор и добавлен визуал для меню, также добавлено авто-обновление"
+        "v1.0 вЂ” ГђГҐГ«ГЁГ§\n" ..
+        "v1.2 вЂ” Г”ГЁГЄГ± ГЎГ ГЈГ®Гў\n" ..
+        "v1.4 вЂ” Г“Г«ГіГ·ГёГҐГ­ГЁГї\n" ..
+        "v1.5 вЂ” ГЂГўГІГ® ГђГ Г§Г¤Г Г·Г \n" ..
+        "v1.55 вЂ” Г”ГЁГЄГ± ГЎГ ГЈГ®Гў 2\n" ..
+        "v1.60 вЂ” ГЂГўГІГ® ГЏГ®Г¦ГҐГ«Г Г­ГЁГҐ + ГЋГІГўГҐГІГ» Г­Г  ГђГҐГЇГ®Г°ГІГ» + ГЂГўГІГ®-ГЄГ®Г¬Г Г­Г¤Г» Г·ГҐГ°ГҐГ§ 10 Г±ГҐГЄ\n" ..
+        "v1.70 вЂ” Г„Г®ГЎГ ГўГ«ГҐГ­Г  ГўГ»Г¤Г Г·Г  Г±ГҐГЎГҐ Г«ГЁГ¤ГҐГ°ГЄГЁ + Г„Г®ГЎГ ГўГ«ГҐГ­Г® Г ГўГІГ® Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ + Г”ГЁГЄГ± Г­ГҐГЄГЁГµ ГЎГ ГЈГ®Гў\n" ..
+        "v1.75 вЂ” Г„Г®ГЎГ ГўГ«ГҐГ­ ГЂГўГІГ® ГЋГІГЎГ®Г° ГЁ Г¤Г®ГЎГ ГўГ«ГҐГ­ ГўГЁГ§ГіГ Г« Г¤Г«Гї Г¬ГҐГ­Гѕ, ГІГ ГЄГ¦ГҐ Г¤Г®ГЎГ ГўГ«ГҐГ­Г® Г ГўГІГ®-Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГҐ"
     ))
 end
 
--- Функция для вкладки "Об Авторе"
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГўГЄГ«Г Г¤ГЄГЁ "ГЋГЎ ГЂГўГІГ®Г°ГҐ"
 local function drawTab10()
     imgui.TextWrapped(
-        u8("FastHelperAdm v"..SCRIPT_VERSION.."\nАвтор: Alim Akimov\n@waldemar03")
+        u8("FastHelperAdm v"..SCRIPT_VERSION.."\nГЂГўГІГ®Г°: Alim Akimov\n@waldemar03")
     )
 end
 
--- Функция для отрисовки левой панели с вкладками
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ Г«ГҐГўГ®Г© ГЇГ Г­ГҐГ«ГЁ Г± ГўГЄГ«Г Г¤ГЄГ Г¬ГЁ
 local function drawLeftPanel()
     imgui.Columns(2, "main_columns", false)
     imgui.SetColumnWidth(0,230)
     
-    -- Заголовок над вкладками
-    imgui.TextColored(imgui.ImVec4(1,0.45,0.45,1), u8"Вкладки")
+    -- Г‡Г ГЈГ®Г«Г®ГўГ®ГЄ Г­Г Г¤ ГўГЄГ«Г Г¤ГЄГ Г¬ГЁ
+    imgui.TextColored(imgui.ImVec4(1,0.45,0.45,1), u8"Г‚ГЄГ«Г Г¤ГЄГЁ")
     imgui.Spacing()
     
-    -- ===== НОВАЯ СТРУКТУРА ВКЛАДОК =====
-    -- Основные вкладки (всегда доступны)
-    if imgui.Selectable(u8"Основные команды", selectedTab==1) then selectedTab=1 end
-    if imgui.Selectable(u8"Настройки меню", selectedTab==2) then selectedTab=2 end
-    if imgui.Selectable(u8"Ответы на Репорты", selectedTab==3) then selectedTab=3 end
-    if imgui.Selectable(u8"Полезные функции", selectedTab==4) then selectedTab=4 end
+    -- ===== ГЌГЋГ‚ГЂГџ Г‘Г’ГђГ“ГЉГ’Г“ГђГЂ Г‚ГЉГ‹ГЂГ„ГЋГЉ =====
+    -- ГЋГ±Г­Г®ГўГ­Г»ГҐ ГўГЄГ«Г Г¤ГЄГЁ (ГўГ±ГҐГЈГ¤Г  Г¤Г®Г±ГІГіГЇГ­Г»)
+    if imgui.Selectable(u8"ГЋГ±Г­Г®ГўГ­Г»ГҐ ГЄГ®Г¬Г Г­Г¤Г»", selectedTab==1) then selectedTab=1 end
+    if imgui.Selectable(u8"ГЌГ Г±ГІГ°Г®Г©ГЄГЁ Г¬ГҐГ­Гѕ", selectedTab==2) then selectedTab=2 end
+    if imgui.Selectable(u8"ГЋГІГўГҐГІГ» Г­Г  ГђГҐГЇГ®Г°ГІГ»", selectedTab==3) then selectedTab=3 end
+    if imgui.Selectable(u8"ГЏГ®Г«ГҐГ§Г­Г»ГҐ ГґГіГ­ГЄГ¶ГЁГЁ", selectedTab==4) then selectedTab=4 end
     
-    -- Вкладки с ограниченным доступом (только для админов уровня 9+)
+    -- Г‚ГЄГ«Г Г¤ГЄГЁ Г± Г®ГЈГ°Г Г­ГЁГ·ГҐГ­Г­Г»Г¬ Г¤Г®Г±ГІГіГЇГ®Г¬ (ГІГ®Г«ГјГЄГ® Г¤Г«Гї Г Г¤Г¬ГЁГ­Г®Гў ГіГ°Г®ГўГ­Гї 9+)
     if adminLevel.v >= 9 then
-        if imgui.Selectable(u8"Авто Мероприятие", selectedTab==5) then selectedTab=5 end
-        if imgui.Selectable(u8"Авто Раздача", selectedTab==6) then selectedTab=6 end
-        if imgui.Selectable(u8"Авто Отбор", selectedTab==7) then selectedTab=7 end
-        if imgui.Selectable(u8"Временное Лидерство", selectedTab==8) then selectedTab=8 end
+        if imgui.Selectable(u8"ГЂГўГІГ® ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ", selectedTab==5) then selectedTab=5 end
+        if imgui.Selectable(u8"ГЂГўГІГ® ГђГ Г§Г¤Г Г·Г ", selectedTab==6) then selectedTab=6 end
+        if imgui.Selectable(u8"ГЂГўГІГ® ГЋГІГЎГ®Г°", selectedTab==7) then selectedTab=7 end
+        if imgui.Selectable(u8"Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г‹ГЁГ¤ГҐГ°Г±ГІГўГ®", selectedTab==8) then selectedTab=8 end
     else
-        -- Для админов уровня 1-8 показываем заблокированные вкладки
-        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"Авто Мероприятие [уровень 9+]")
-        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"Авто Раздача [уровень 9+]")
-        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"Авто Отбор [уровень 9+]")
-        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"Временное Лидерство [уровень 9+]")
+        -- Г„Г«Гї Г Г¤Г¬ГЁГ­Г®Гў ГіГ°Г®ГўГ­Гї 1-8 ГЇГ®ГЄГ Г§Г»ГўГ ГҐГ¬ Г§Г ГЎГ«Г®ГЄГЁГ°Г®ГўГ Г­Г­Г»ГҐ ГўГЄГ«Г Г¤ГЄГЁ
+        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"ГЂГўГІГ® ГЊГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ [ГіГ°Г®ГўГҐГ­Гј 9+]")
+        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"ГЂГўГІГ® ГђГ Г§Г¤Г Г·Г  [ГіГ°Г®ГўГҐГ­Гј 9+]")
+        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"ГЂГўГІГ® ГЋГІГЎГ®Г° [ГіГ°Г®ГўГҐГ­Гј 9+]")
+        imgui.TextColored(imgui.ImVec4(0.5,0.5,0.5,1), u8"Г‚Г°ГҐГ¬ГҐГ­Г­Г®ГҐ Г‹ГЁГ¤ГҐГ°Г±ГІГўГ® [ГіГ°Г®ГўГҐГ­Гј 9+]")
     end
     
-    -- Остальные информационные вкладки
-    if imgui.Selectable(u8"Обновления", selectedTab==9) then selectedTab=9 end
-    if imgui.Selectable(u8"Об Авторе", selectedTab==10) then selectedTab=10 end
+    -- ГЋГ±ГІГ Г«ГјГ­Г»ГҐ ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГ®Г­Г­Г»ГҐ ГўГЄГ«Г Г¤ГЄГЁ
+    if imgui.Selectable(u8"ГЋГЎГ­Г®ГўГ«ГҐГ­ГЁГї", selectedTab==9) then selectedTab=9 end
+    if imgui.Selectable(u8"ГЋГЎ ГЂГўГІГ®Г°ГҐ", selectedTab==10) then selectedTab=10 end
     
-    -- переход к правой колонке
+    -- ГЇГҐГ°ГҐГµГ®Г¤ ГЄ ГЇГ°Г ГўГ®Г© ГЄГ®Г«Г®Г­ГЄГҐ
     imgui.NextColumn()
 end
 
--- Функция для отрисовки правой панели с содержимым вкладок
+-- Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ ГЇГ°Г ГўГ®Г© ГЇГ Г­ГҐГ«ГЁ Г± Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г»Г¬ ГўГЄГ«Г Г¤Г®ГЄ
 local function drawRightPanel()
-    -- контейнер ПРАВОЙ части
+    -- ГЄГ®Г­ГІГҐГ©Г­ГҐГ° ГЏГђГЂГ‚ГЋГ‰ Г·Г Г±ГІГЁ
     imgui.BeginChild("##content", imgui.ImVec2(0, -40), true)
 
-    -- Содержимое вкладок
+    -- Г‘Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ ГўГЄГ«Г Г¤Г®ГЄ
     if selectedTab == 1 then
         drawTab1()
     elseif selectedTab == 2 then
@@ -1018,20 +1018,20 @@ local function drawRightPanel()
         drawTab10()
     end
 
-    -- закрываем контейнер правой части
+    -- Г§Г ГЄГ°Г»ГўГ ГҐГ¬ ГЄГ®Г­ГІГҐГ©Г­ГҐГ° ГЇГ°Г ГўГ®Г© Г·Г Г±ГІГЁ
     imgui.EndChild()
 end
 
--- Основная функция отрисовки меню
+-- ГЋГ±Г­Г®ГўГ­Г Гї ГґГіГ­ГЄГ¶ГЁГї Г®ГІГ°ГЁГ±Г®ГўГЄГЁ Г¬ГҐГ­Гѕ
 local function drawMainMenu()
     if not showMenu.v then return end
     
-    -- Обновляем радужный стиль если он выбран
+    -- ГЋГЎГ­Г®ГўГ«ГїГҐГ¬ Г°Г Г¤ГіГ¦Г­Г»Г© Г±ГІГЁГ«Гј ГҐГ±Г«ГЁ Г®Г­ ГўГ»ГЎГ°Г Г­
     if menuColor.v == 7 then
         ApplyRainbowStyle()
     end
     
-    -- Применяем стиль в зависимости от сохраненного цвета
+    -- ГЏГ°ГЁГ¬ГҐГ­ГїГҐГ¬ Г±ГІГЁГ«Гј Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ Г±Г®ГµГ°Г Г­ГҐГ­Г­Г®ГЈГ® Г¶ГўГҐГІГ 
     if not styleApplied then 
         if menuColor.v == 0 then
             ApplyRedStyle()
@@ -1062,17 +1062,17 @@ local function drawMainMenu()
     imgui.SetNextWindowSize(imgui.ImVec2(760,440),imgui.Cond.FirstUseEver)
     imgui.Begin(u8"FastHelperAdm v"..SCRIPT_VERSION,showMenu)
     
-    -- Отрисовка левой панели с вкладками
+    -- ГЋГІГ°ГЁГ±Г®ГўГЄГ  Г«ГҐГўГ®Г© ГЇГ Г­ГҐГ«ГЁ Г± ГўГЄГ«Г Г¤ГЄГ Г¬ГЁ
     drawLeftPanel()
     
-    -- Отрисовка правой панели с содержимым
+    -- ГЋГІГ°ГЁГ±Г®ГўГЄГ  ГЇГ°Г ГўГ®Г© ГЇГ Г­ГҐГ«ГЁ Г± Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г»Г¬
     drawRightPanel()
     
-    -- сброс колонок
+    -- Г±ГЎГ°Г®Г± ГЄГ®Г«Г®Г­Г®ГЄ
     imgui.Columns(1)
     
     imgui.Separator()
-    if imgui.Button(u8"Закрыть") then showMenu.v=false; saveCfg() end
+    if imgui.Button(u8"Г‡Г ГЄГ°Г»ГІГј") then showMenu.v=false; saveCfg() end
     imgui.End()
 end
 
@@ -1080,7 +1080,7 @@ end
 function main()
     repeat wait(0) until isSampAvailable()
     
-    -- ?? ОДИН ЕДИНСТВЕННЫЙ ВЫЗОВ checkUpdate
+    -- ?? ГЋГ„Г€ГЌ Г…Г„Г€ГЌГ‘Г’Г‚Г…ГЌГЌГ›Г‰ Г‚Г›Г‡ГЋГ‚ checkUpdate
     lua_thread.create(function()
         wait(10000)
         checkUpdate()
@@ -1089,13 +1089,13 @@ function main()
     sampRegisterChatCommand("plhelp",function() showMenu.v=not showMenu.v end)
     sampRegisterChatCommand("pl",cmd_pl)
 
-    -- метка захода
+    -- Г¬ГҐГІГЄГ  Г§Г ГµГ®Г¤Г 
     loginTime = os.clock()
 
-    -- загружаем настройки
+    -- Г§Г ГЈГ°ГіГ¦Г ГҐГ¬ Г­Г Г±ГІГ°Г®Г©ГЄГЁ
     loadCfg()
 
-    -- Применяем сохраненный цвет меню
+    -- ГЏГ°ГЁГ¬ГҐГ­ГїГҐГ¬ Г±Г®ГµГ°Г Г­ГҐГ­Г­Г»Г© Г¶ГўГҐГІ Г¬ГҐГ­Гѕ
     if menuColor.v == 0 then
         ApplyRedStyle()
     elseif menuColor.v == 1 then
@@ -1115,49 +1115,49 @@ function main()
     end
 
     sampAddChatMessage("{FF0000}========================================",-1)
-    sampAddChatMessage("{00FF00}FastHelperAdm загружен",-1)
-    sampAddChatMessage("{00FF00}Автор: Alim Akimov (@waldemar03)",-1)
-    sampAddChatMessage("{00FF00}Версия: v"..SCRIPT_VERSION,-1)
+    sampAddChatMessage("{00FF00}FastHelperAdm Г§Г ГЈГ°ГіГ¦ГҐГ­",-1)
+    sampAddChatMessage("{00FF00}ГЂГўГІГ®Г°: Alim Akimov (@waldemar03)",-1)
+    sampAddChatMessage("{00FF00}Г‚ГҐГ°Г±ГЁГї: v"..SCRIPT_VERSION,-1)
     sampAddChatMessage("{FF0000}========================================",-1)
-    sampAddChatMessage("{ADFF2F}Для открытия меню скрипта пропишите команду /plhelp",-1)
-    sampAddChatMessage("{ADFF2F}Для использования скрипта пропишите команду /pl [id]",-1)
+    sampAddChatMessage("{ADFF2F}Г„Г«Гї Г®ГІГЄГ°Г»ГІГЁГї Г¬ГҐГ­Гѕ Г±ГЄГ°ГЁГЇГІГ  ГЇГ°Г®ГЇГЁГёГЁГІГҐ ГЄГ®Г¬Г Г­Г¤Гі /plhelp",-1)
+    sampAddChatMessage("{ADFF2F}Г„Г«Гї ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ Г­ГЁГї Г±ГЄГ°ГЁГЇГІГ  ГЇГ°Г®ГЇГЁГёГЁГІГҐ ГЄГ®Г¬Г Г­Г¤Гі /pl [id]",-1)
 
-    -- поток для авто-сохранения настроек
+    -- ГЇГ®ГІГ®ГЄ Г¤Г«Гї Г ГўГІГ®-Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Г­Г Г±ГІГ°Г®ГҐГЄ
     lua_thread.create(function()
         while true do
-            wait(5000) -- раз в 5 сек
-            saveCfg() -- сохраняем всегда
+            wait(5000) -- Г°Г Г§ Гў 5 Г±ГҐГЄ
+            saveCfg() -- Г±Г®ГµГ°Г Г­ГїГҐГ¬ ГўГ±ГҐГЈГ¤Г 
         end
     end)
     
-    -- поток для асинхронной обработки мероприятий
+    -- ГЇГ®ГІГ®ГЄ Г¤Г«Гї Г Г±ГЁГ­ГµГ°Г®Г­Г­Г®Г© Г®ГЎГ°Г ГЎГ®ГІГЄГЁ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГ©
     lua_thread.create(function()
         while true do
             wait(0)
             
-            -- Обработка авто-мероприятия
+            -- ГЋГЎГ°Г ГЎГ®ГІГЄГ  Г ГўГІГ®-Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГї
             if startAutoMpFlag then
                 startAutoMpFlag = false
                 doAutoMP()
             end
             
-            -- Обработка авто-отбора
+            -- ГЋГЎГ°Г ГЎГ®ГІГЄГ  Г ГўГІГ®-Г®ГІГЎГ®Г°Г 
             if startAutoOtborFlag then
                 startAutoOtborFlag = false
                 doAutoOtbor()
             end
             
-            -- Обработка авто-раздачи
+            -- ГЋГЎГ°Г ГЎГ®ГІГЄГ  Г ГўГІГ®-Г°Г Г§Г¤Г Г·ГЁ
             if startRazdachaFlag then
                 startRazdachaFlag = false
                 doRazdacha()
             end
             
-            -- Обработка сохранения настроек
+            -- ГЋГЎГ°Г ГЎГ®ГІГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Г­Г Г±ГІГ°Г®ГҐГЄ
             if saveSettingsFlag then
                 saveSettingsFlag = false
                 saveCfg()
-                sampAddChatMessage("{33CCFF}[FastHelperAdm] Настройки сохранены", -1)
+                sampAddChatMessage("{33CCFF}[FastHelperAdm] ГЌГ Г±ГІГ°Г®Г©ГЄГЁ Г±Г®ГµГ°Г Г­ГҐГ­Г»", -1)
             end
         end
     end)
@@ -1167,7 +1167,7 @@ function main()
         imgui.Process=showMenu.v
         checkAutoWish()
 
-        -- авто-команды через 15 сек после захода (один раз)
+        -- Г ГўГІГ®-ГЄГ®Г¬Г Г­Г¤Г» Г·ГҐГ°ГҐГ§ 15 Г±ГҐГЄ ГЇГ®Г±Г«ГҐ Г§Г ГµГ®Г¤Г  (Г®Г¤ГЁГ­ Г°Г Г§)
         if autoEnable.v and not cmdExecuted and os.clock() - loginTime >= 15 then
             cmdExecuted = true
             lua_thread.create(function()
@@ -1176,7 +1176,7 @@ function main()
                 if autoChatsms.v  then sampSendChat("/chatsms")  wait(1000) end
                 if autoChat.v     then sampSendChat("/chat")     wait(1000) end
                 if autoTogphone.v then sampSendChat("/togphone") end
-                sampAddChatMessage("{33CCFF}[FastHelperAdm] Авто-команды выполнены",-1)
+                sampAddChatMessage("{33CCFF}[FastHelperAdm] ГЂГўГІГ®-ГЄГ®Г¬Г Г­Г¤Г» ГўГ»ГЇГ®Г«Г­ГҐГ­Г»",-1)
             end)
         end
 
@@ -1187,19 +1187,19 @@ function main()
                 if a.action == "SPAWN" then
                     sampSendChat("/sp "..a.id)
                     wait(800)
-                    sampSendChat("/pm "..a.id.." Вы успешно заспавнены | Приятной Игры <3")
+                    sampSendChat("/pm "..a.id.." Г‚Г» ГіГ±ГЇГҐГёГ­Г® Г§Г Г±ГЇГ ГўГ­ГҐГ­Г» | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
                 elseif a.action == "WATCH" then
                     sampSendChat("/re "..a.id)
                     wait(800)
-                    sampSendChat("/pm "..a.id.." Я слежу | Приятной Игры <3")
+                    sampSendChat("/pm "..a.id.." Гџ Г±Г«ГҐГ¦Гі | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
                 elseif a.action == "TRANSFER" then
-                    sampSendChat("/a <<Репорт от "..a.nick.."["..a.id.."]>> "..a.reportText)
-                    wait(1200)  -- ?? Увеличена задержка для предотвращения флуда
-                    sampSendChat("/pm "..a.id.." Ваш репорт успешно передан | Приятной Игры <3")
+                    sampSendChat("/a <<ГђГҐГЇГ®Г°ГІ Г®ГІ "..a.nick.."["..a.id.."]>> "..a.reportText)
+                    wait(1200)  -- ?? Г“ГўГҐГ«ГЁГ·ГҐГ­Г  Г§Г Г¤ГҐГ°Г¦ГЄГ  Г¤Г«Гї ГЇГ°ГҐГ¤Г®ГІГўГ°Г Г№ГҐГ­ГЁГї ГґГ«ГіГ¤Г 
+                    sampSendChat("/pm "..a.id.." Г‚Г Гё Г°ГҐГЇГ®Г°ГІ ГіГ±ГЇГҐГёГ­Г® ГЇГҐГ°ГҐГ¤Г Г­ | ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» <3")
                 elseif a.action == "SVGROUP" then
-                    sampSendChat("/pm "..a.id.." Уважаемый Игрок отправьте жалобу в нашу Свободную Группу @inferno_sv")
+                    sampSendChat("/pm "..a.id.." Г“ГўГ Г¦Г ГҐГ¬Г»Г© Г€ГЈГ°Г®ГЄ Г®ГІГЇГ°Г ГўГјГІГҐ Г¦Г Г«Г®ГЎГі Гў Г­Г ГёГі Г‘ГўГ®ГЎГ®Г¤Г­ГіГѕ ГѓГ°ГіГЇГЇГі @inferno_sv")
                 elseif a.action == "OFFLINE" then
-                    sampAddChatMessage("{FFA500}[FastHelperAdm] Репорт закрыт (игрок оффлайн)", -1)
+                    sampAddChatMessage("{FFA500}[FastHelperAdm] ГђГҐГЇГ®Г°ГІ Г§Г ГЄГ°Г»ГІ (ГЁГЈГ°Г®ГЄ Г®ГґГґГ«Г Г©Г­)", -1)
                 else
                     sampSendChat("/pm "..a.id.." "..a.text)
                 end
@@ -1215,15 +1215,15 @@ function main()
             end)
         end
         
-        -- Авто-раздача
+        -- ГЂГўГІГ®-Г°Г Г§Г¤Г Г·Г 
         if active_razd and active_razd2 and not antiFlood then
             antiFlood = true
             active_razd = false
             active_razd2 = false
             
-            -- Проверяем подключение игрока
+            -- ГЏГ°Г®ГўГҐГ°ГїГҐГ¬ ГЇГ®Г¤ГЄГ«ГѕГ·ГҐГ­ГЁГҐ ГЁГЈГ°Г®ГЄГ 
             if not sampIsPlayerConnected(razd_player_id) then
-                sampAddChatMessage('{FF5555}[FastHelperAdm] Победитель вышел, раздача отменена.', -1)
+                sampAddChatMessage('{FF5555}[FastHelperAdm] ГЏГ®ГЎГҐГ¤ГЁГІГҐГ«Гј ГўГ»ГёГҐГ«, Г°Г Г§Г¤Г Г·Г  Г®ГІГ¬ГҐГ­ГҐГ­Г .', -1)
                 resetRazdacha()
             else
                 local idx = combo_priz.v + 1
@@ -1244,22 +1244,22 @@ function main()
                 wait(FLOOD_DELAY)
                 
                 local pm = isStyle
-                    and ('Поздравляем! Вы выиграли стиль боя "'..prize..'"')
-                    or  ('Поздравляем! Вы выиграли '..prize..' '..prettySum(amount))
+                    and ('ГЏГ®Г§Г¤Г°Г ГўГ«ГїГҐГ¬! Г‚Г» ГўГ»ГЁГЈГ°Г Г«ГЁ Г±ГІГЁГ«Гј ГЎГ®Гї "'..prize..'"')
+                    or  ('ГЏГ®Г§Г¤Г°Г ГўГ«ГїГҐГ¬! Г‚Г» ГўГ»ГЁГЈГ°Г Г«ГЁ '..prize..' '..prettySum(amount))
                     
-                sampSendChat('/pm '..razd_player_id..' '..pm..' | Приятной игры от админа <3')
+                sampSendChat('/pm '..razd_player_id..' '..pm..' | ГЏГ°ГЁГїГІГ­Г®Г© ГЁГЈГ°Г» Г®ГІ Г Г¤Г¬ГЁГ­Г  <3')
                 
                 wait(FLOOD_DELAY)
                 
                 local announce = isStyle
-                    and ('WIN '..nick..'['..razd_player_id..'] стиль "'..prize..'"')
+                    and ('WIN '..nick..'['..razd_player_id..'] Г±ГІГЁГ«Гј "'..prize..'"')
                     or  ('WIN '..nick..'['..razd_player_id..'] '..prize..' '..prettySum(amount))
                 
                 sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..announce)
                 
                 addGuiLog(getMSKTime()..' | '..announce)
                 
-                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
+                -- ?? ГЏГЋГ‹ГЌГ›Г‰ Г‘ГЃГђГЋГ‘ Г”Г‹ГЂГѓГЋГ‚ ГЇГ®Г±Г«ГҐ ГіГ±ГЇГҐГёГ­Г®Г© Г°Г Г§Г¤Г Г·ГЁ
                 resetRazdacha()
             end
         end
@@ -1270,40 +1270,40 @@ end
 function cmd_pl(param)
     local now=os.clock()
     if now-lastSendTime<cooldown then
-        sampAddChatMessage("{FF0000}[FastReply] Подождите немного",-1) return
+        sampAddChatMessage("{FF0000}[FastReply] ГЏГ®Г¤Г®Г¦Г¤ГЁГІГҐ Г­ГҐГ¬Г­Г®ГЈГ®",-1) return
     end
     lastSendTime=now
     if not param or param=="" then
-        sampAddChatMessage("{FF0000}Использование: /pl [id] [код/текст]",-1) return
+        sampAddChatMessage("{FF0000}Г€Г±ГЇГ®Г«ГјГ§Г®ГўГ Г­ГЁГҐ: /pl [id] [ГЄГ®Г¤/ГІГҐГЄГ±ГІ]",-1) return
     end
     local space=param:find(" ")
     local id=tonumber(space and param:sub(1,space-1) or param)
     local txt=space and param:sub(space+1) or ""
     if not id or not sampIsPlayerConnected(id) then
-        sampAddChatMessage("{FF0000}Ошибка: игрок не найден",-1) return
+        sampAddChatMessage("{FF0000}ГЋГёГЁГЎГЄГ : ГЁГЈГ°Г®ГЄ Г­ГҐ Г­Г Г©Г¤ГҐГ­",-1) return
     end
     local final=fastCodes[txt] or txt or ""
-    local msg=(final~="" and final.." | " or "").."Приятной Игры от Администратора <3"
+    local msg=(final~="" and final.." | " or "").."ГЏГ°ГЁГїГІГ­Г®Г© Г€ГЈГ°Г» Г®ГІ ГЂГ¤Г¬ГЁГ­ГЁГ±ГІГ°Г ГІГ®Г°Г  <3"
     sampSendChat("/pm "..id.." "..msg)
 end
 
 -- ===== GUI =====
 function imgui.OnDrawFrame()
-    -- Просто вызываем основную функцию отрисовки меню
+    -- ГЏГ°Г®Г±ГІГ® ГўГ»Г§Г»ГўГ ГҐГ¬ Г®Г±Г­Г®ГўГ­ГіГѕ ГґГіГ­ГЄГ¶ГЁГѕ Г®ГІГ°ГЁГ±Г®ГўГЄГЁ Г¬ГҐГ­Гѕ
     drawMainMenu()
 end
 
 -- ===== /rep CAPTOR =====
 function sampev.onServerMessage(color,text)
-    local nick,pid,msg=text:match('Репорт от (.*)%[(%d+)%]: %{FFFFFF%}(.*)')
+    local nick,pid,msg=text:match('ГђГҐГЇГ®Г°ГІ Г®ГІ (.*)%[(%d+)%]: %{FFFFFF%}(.*)')
     if nick and pid and msg then
         addReport(tonumber(pid),nick,msg)
     end
 
     if active_razd and not active_razd2 and text_word.v ~= "" then
-        local _,pid2,msg2 = text:match('Репорт от (.*)%[(%d+)%]: %{FFFFFF%}(.*)')
+        local _,pid2,msg2 = text:match('ГђГҐГЇГ®Г°ГІ Г®ГІ (.*)%[(%d+)%]: %{FFFFFF%}(.*)')
         if msg2 then
-            local repWord = msg2:match("^(%S+)")  -- ?? Берем только первое слово
+            local repWord = msg2:match("^(%S+)")  -- ?? ГЃГҐГ°ГҐГ¬ ГІГ®Г«ГјГЄГ® ГЇГҐГ°ГўГ®ГҐ Г±Г«Г®ГўГ®
             if repWord == u8:decode(text_word.v) then
                 razd_player_id = tonumber(pid2)
                 active_razd2 = true
@@ -1312,12 +1312,12 @@ function sampev.onServerMessage(color,text)
     end
 end
 
--- ===== ПЕРЕХВАТ ДИАЛОГА /mp =====
+-- ===== ГЏГ…ГђГ…Г•Г‚ГЂГ’ Г„Г€ГЂГ‹ГЋГѓГЂ /mp =====
 function sampev.onShowDialog(id, style, title, button1, button2, text)
     if not title then return end
 
-    -- Авто мероприятие
-    if mpAutoStep == 1 and title:find(u8:decode("Меню мероприятий")) then
+    -- ГЂГўГІГ® Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГҐ
+    if mpAutoStep == 1 and title:find(u8:decode("ГЊГҐГ­Гѕ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГ©")) then
         lua_thread.create(function()
             wait(200)
             sampSendDialogResponse(id, 1, 0, "")
@@ -1325,8 +1325,8 @@ function sampev.onShowDialog(id, style, title, button1, button2, text)
         end)
     end
 
-    -- Авто отбор
-    if otborRunning and title:find(u8:decode("Меню мероприятий")) then
+    -- ГЂГўГІГ® Г®ГІГЎГ®Г°
+    if otborRunning and title:find(u8:decode("ГЊГҐГ­Гѕ Г¬ГҐГ°Г®ГЇГ°ГЁГїГІГЁГ©")) then
         lua_thread.create(function()
             wait(200)
             sampSendDialogResponse(id, 1, 0, "")
