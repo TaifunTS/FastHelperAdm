@@ -7,76 +7,56 @@ script_version("1.75")
 SCRIPT_VERSION = "1.75"
 SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
-local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
-local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
 local script_path = thisScript().path
 local new_path = script_path .. ".new"
 local backup_path = script_path .. ".bak"
-local UPDATE_DONE = false
 
--- ?? ШАГ 1. ЗАМЕНА .new — В САМОМ НАЧАЛЕ ФАЙЛА
+-- === ПРИМЕНЕНИЕ ОБНОВЛЕНИЯ ===
 if doesFileExist(new_path) then
     if doesFileExist(backup_path) then
         os.remove(backup_path)
     end
-
     os.rename(script_path, backup_path)
     os.rename(new_path, script_path)
 end
+
+local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
+local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
+local UPDATE_DONE = false
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ =====
 function checkUpdate()
     if UPDATE_DONE then return end
     UPDATE_DONE = true
 
-    local versionFile = getWorkingDirectory() .. "\\FastHelperAdm.version"
+    local versionFile = getWorkingDirectory().."\\FastHelperAdm.version"
 
-    if doesFileExist(versionFile) then
-        os.remove(versionFile)
-    end
+    if doesFileExist(versionFile) then os.remove(versionFile) end
 
     downloadUrlToFile(VERSION_URL, versionFile, function(_, status)
         if status ~= 58 then return end
 
         lua_thread.create(function()
-            wait(700)
+            wait(500)
 
             local f = io.open(versionFile, "r")
             if not f then return end
-
             local online = f:read("*l")
             f:close()
             os.remove(versionFile)
 
-            if not online or online == SCRIPT_VERSION then
-                return
-            end
+            if not online or online == SCRIPT_VERSION then return end
 
             sampAddChatMessage(
                 "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
             )
 
-            if doesFileExist(new_path) then
-                os.remove(new_path)
-            end
-
-            wait(700)
+            if doesFileExist(new_path) then os.remove(new_path) end
+            wait(500)
 
             downloadUrlToFile(SCRIPT_URL, new_path, function(_, st)
                 if st ~= 58 then
                     sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
-                    return
-                end
-
-                local nf = io.open(new_path, "r")
-                if not nf then return end
-
-                local head = nf:read(120)
-                nf:close()
-
-                if head:find("<!DOCTYPE") or #head < 50 then
-                    os.remove(new_path)
-                    sampAddChatMessage("{FF4444}[FastHelperAdm] Некорректный файл", -1)
                     return
                 end
 
@@ -1100,9 +1080,8 @@ end
 function main()
     repeat wait(0) until isSampAvailable()
     
-    -- ?? ШАГ 2. ОДИН ЕДИНСТВЕННЫЙ ВЫЗОВ checkUpdate
+    -- ?? ОДИН ЕДИНСТВЕННЫЙ ВЫЗОВ checkUpdate
     lua_thread.create(function()
-        repeat wait(0) until isSampAvailable()
         wait(10000)
         checkUpdate()
     end)
@@ -1215,7 +1194,7 @@ function main()
                     sampSendChat("/pm "..a.id.." Я слежу | Приятной Игры <3")
                 elseif a.action == "TRANSFER" then
                     sampSendChat("/a <<Репорт от "..a.nick.."["..a.id.."]>> "..a.reportText)
-                    wait(800)
+                    wait(1200)  -- ?? Увеличена задержка для предотвращения флуда
                     sampSendChat("/pm "..a.id.." Ваш репорт успешно передан | Приятной Игры <3")
                 elseif a.action == "SVGROUP" then
                     sampSendChat("/pm "..a.id.." Уважаемый Игрок отправьте жалобу в нашу Свободную Группу @inferno_sv")
@@ -1323,9 +1302,12 @@ function sampev.onServerMessage(color,text)
 
     if active_razd and not active_razd2 and text_word.v ~= "" then
         local _,pid2,msg2 = text:match('Репорт от (.*)%[(%d+)%]: %{FFFFFF%}(.*)')
-        if msg2 and msg2 == u8:decode(text_word.v) then
-            razd_player_id = tonumber(pid2)
-            active_razd2 = true
+        if msg2 then
+            local repWord = msg2:match("^(%S+)")  -- ?? Берем только первое слово
+            if repWord == u8:decode(text_word.v) then
+                razd_player_id = tonumber(pid2)
+                active_razd2 = true
+            end
         end
     end
 end
