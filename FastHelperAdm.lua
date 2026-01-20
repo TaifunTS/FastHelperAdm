@@ -9,14 +9,25 @@ SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
 local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
 local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
-local SCRIPT_PATH = thisScript().path
-local NEW_PATH    = SCRIPT_PATH .. ".new"
-local UPDATE_IN_PROGRESS = false
+local script_path = thisScript().path
+local new_path = script_path .. ".new"
+local backup_path = script_path .. ".bak"
+local UPDATE_DONE = false
 
--- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
+-- ?? ШАГ 1. ЗАМЕНА .new — В САМОМ НАЧАЛЕ ФАЙЛА
+if doesFileExist(new_path) then
+    if doesFileExist(backup_path) then
+        os.remove(backup_path)
+    end
+
+    os.rename(script_path, backup_path)
+    os.rename(new_path, script_path)
+end
+
+-- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ =====
 function checkUpdate()
-    if UPDATE_IN_PROGRESS then return end
-    UPDATE_IN_PROGRESS = true
+    if UPDATE_DONE then return end
+    UPDATE_DONE = true
 
     local versionFile = getWorkingDirectory() .. "\\FastHelperAdm.version"
 
@@ -25,26 +36,19 @@ function checkUpdate()
     end
 
     downloadUrlToFile(VERSION_URL, versionFile, function(_, status)
-        if status ~= 58 then
-            UPDATE_IN_PROGRESS = false
-            return
-        end
+        if status ~= 58 then return end
 
         lua_thread.create(function()
-            wait(500) -- ?? КЛЮЧЕВО
+            wait(700)
 
             local f = io.open(versionFile, "r")
-            if not f then
-                UPDATE_IN_PROGRESS = false
-                return
-            end
+            if not f then return end
 
             local online = f:read("*l")
             f:close()
             os.remove(versionFile)
 
             if not online or online == SCRIPT_VERSION then
-                UPDATE_IN_PROGRESS = false
                 return
             end
 
@@ -52,28 +56,27 @@ function checkUpdate()
                 "{33CCFF}[FastHelperAdm] Найдено обновление v"..online, -1
             )
 
-            if doesFileExist(NEW_PATH) then
-                os.remove(NEW_PATH)
+            if doesFileExist(new_path) then
+                os.remove(new_path)
             end
 
-            wait(500) -- ?? ОБЯЗАТЕЛЬНО
+            wait(700)
 
-            downloadUrlToFile(SCRIPT_URL, NEW_PATH, function(_, st)
-                UPDATE_IN_PROGRESS = false
-
+            downloadUrlToFile(SCRIPT_URL, new_path, function(_, st)
                 if st ~= 58 then
                     sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки", -1)
                     return
                 end
 
-                local nf = io.open(NEW_PATH, "r")
+                local nf = io.open(new_path, "r")
                 if not nf then return end
-                local head = nf:read(100)
+
+                local head = nf:read(120)
                 nf:close()
 
-                if head:find("<!DOCTYPE") then
-                    os.remove(NEW_PATH)
-                    sampAddChatMessage("{FF4444}[FastHelperAdm] GitHub вернул HTML", -1)
+                if head:find("<!DOCTYPE") or #head < 50 then
+                    os.remove(new_path)
+                    sampAddChatMessage("{FF4444}[FastHelperAdm] Некорректный файл", -1)
                     return
                 end
 
@@ -789,7 +792,7 @@ local function drawTab4()
     end
 end
 
--- Функция для вкладке "Авто Мероприятие"
+-- Функция для вкладки "Авто Мероприятие"
 local function drawTab5()
     -- Проверка доступа к вкладке Авто Мероприятие
     if adminLevel.v >= 9 then
@@ -1095,18 +1098,12 @@ end
 
 -- ===== MAIN =====
 function main()
-    -- Безопасная замена файла при запуске
-    if doesFileExist(NEW_PATH) then
-        os.remove(SCRIPT_PATH)
-        os.rename(NEW_PATH, SCRIPT_PATH)
-    end
-    
     repeat wait(0) until isSampAvailable()
     
-    -- Правильный вызов автообновления ТОЛЬКО ОДИН РАЗ
+    -- ?? ШАГ 2. ОДИН ЕДИНСТВЕННЫЙ ВЫЗОВ checkUpdate
     lua_thread.create(function()
         repeat wait(0) until isSampAvailable()
-        wait(8000)
+        wait(10000)
         checkUpdate()
     end)
     
