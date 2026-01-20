@@ -38,20 +38,21 @@ function checkUpdate()
 
         if not versionText then return end
 
-        -- ?? ФИКС №1: Убираем все пробелы и переносы строк перед сравнением
+        -- ?? ФИКС: Убираем все пробелы и переносы строк перед сравнением
         versionText = versionText:gsub("%s+", "")
+        local cleanCurrentVersion = CURRENT_VERSION:gsub("%s+", "")
         
         -- Сравниваем версии как строки
-        if versionText ~= CURRENT_VERSION then
+        if versionText ~= cleanCurrentVersion then
             sampAddChatMessage(
                 "{33CCFF}[FastHelperAdm] Найдено обновление v"..versionText..
-                " (у вас v"..CURRENT_VERSION..")", -1
+                " (у вас v"..cleanCurrentVersion..")", -1
             )
             sampAddChatMessage(
                 "{33CCFF}[FastHelperAdm] Начинаю загрузку обновления...", -1
             )
             
-            -- ?? ФИКС №2: Скачиваем во временный файл, а не в текущий
+            -- ?? ФИКС: Скачиваем во временный файл, а не в текущий
             local TEMP_PATH = SCRIPT_PATH .. ".new"
             
             downloadUrlToFile(SCRIPT_URL, TEMP_PATH, function(_, st)
@@ -71,14 +72,14 @@ function checkUpdate()
             end)
         else
             sampAddChatMessage(
-                "{00FF00}[FastHelperAdm] У вас актуальная версия v"..CURRENT_VERSION,
+                "{00FF00}[FastHelperAdm] У вас актуальная версия v"..cleanCurrentVersion,
                 -1
             )
         end
     end)
 end
 
--- ?? ФИКС №2: Функция применения обновления с использованием временного файла
+-- ?? ФИКС: Функция применения обновления с использованием временного файла
 function applyUpdate(tempPath)
     if not doesFileExist(tempPath) then
         sampAddChatMessage(
@@ -344,14 +345,21 @@ local otbor_leader_combo = imgui.ImInt(0)
 -- Для настроек меню
 local menuColor = imgui.ImInt(0) -- 0 = Красный, 1 = Зеленый, 2 = Синий, 3 = Оранжевый, 4 = Желтый, 5 = Голубой, 6 = Фиолетовый, 7 = Радужный
 
--- ===== Флаг для префикса раздачи =====
-local razdachaPrefixSent = false
-
 -- ===== ФЛАГИ ДЛЯ АСИНХРОННОЙ ОБРАБОТКИ =====
 local startAutoMpFlag = false
 local startAutoOtborFlag = false
 local startRazdachaFlag = false
 local saveSettingsFlag = false
+
+-- ===== ФУНКЦИЯ ДЛЯ ПОЛНОГО СБРОСА РАЗДАЧИ =====
+local function resetRazdacha()
+    razdLocked = false
+    active_razd = false
+    active_razd2 = false
+    antiFlood = false
+    razd_player_id = -1
+    startRazdachaFlag = false
+end
 
 local function addGuiLog(text) table.insert(guiLog,1,u8:decode(text)) if #guiLog>10 then table.remove(guiLog) end end
 local function getMSKTime() return os.date('%H:%M:%S',os.time(os.date('!*t'))+MSK_OFFSET) end
@@ -624,6 +632,7 @@ function doRazdacha()
         txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — "..pName.." "..prettySum(amount)
     end
     
+    -- ?? УДАЛЕНО: Не отправляем /a z aad для раздачи (никогда не нужно)
     sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..txt)
     
     -- Запускаем таймер для отслеживания ответов
@@ -885,11 +894,10 @@ local function drawTab6()
         
         if imgui.Button(u8"Начать раздачу") and text_word.v~='' and not razdLocked then
             -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПРИ НОВОЙ РАЗДАЧЕ
+            resetRazdacha()
             razdLocked = true
             active_razd = true
-            active_razd2 = false  -- ?? ВАЖНО: сбрасываем при старте
-            razdachaPrefixSent = false
-            antiFlood = false
+            active_razd2 = false
             razd_player_id = -1
             startRazdachaFlag = true
         end
@@ -1265,60 +1273,45 @@ function main()
             
             -- Проверяем подключение игрока
             if not sampIsPlayerConnected(razd_player_id) then
-                sampAddChatMessage('{FF5555}[FastHelperAdm] Победитель вышел, раздача отменена.',-1)
-                
-                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ ПЕРЕД RETURN
-                razdLocked = false
-                antiFlood = false
-                active_razd = false
-                active_razd2 = false
-                razd_player_id = -1
-                razdachaPrefixSent = false
-                startRazdachaFlag = false
-                return  -- ?? ТОЛЬКО ПОСЛЕ сброса
-            end
-            
-            local idx = combo_priz.v + 1
-            local statId = prizStatId[idx]
-            local prize = u8:decode(arr_priz[idx])
-            local nick = sampGetPlayerNickname(razd_player_id)
-            local isStyle = (idx >= 11 and idx <= 13)
-            local amount = isStyle and 50000 or (parseAmount(text_real.v) or 0)
-            
-            wait(FLOOD_DELAY)
-            
-            if statId == 7 then
-                sampSendChat('/money '..razd_player_id..' '..amount)
+                sampAddChatMessage('{FF5555}[FastHelperAdm] Победитель вышел, раздача отменена.', -1)
+                resetRazdacha()
             else
-                sampSendChat('/setstat '..razd_player_id..' '..statId..' '..amount)
-            end
-            
-            wait(FLOOD_DELAY)
-            
-            local pm = isStyle
-                and ('Поздравляем! Вы выиграли стиль боя "'..prize..'"')
-                or  ('Поздравляем! Вы выиграли '..prize..' '..prettySum(amount))
+                local idx = combo_priz.v + 1
+                local statId = prizStatId[idx]
+                local prize = u8:decode(arr_priz[idx])
+                local nick = sampGetPlayerNickname(razd_player_id)
+                local isStyle = (idx >= 11 and idx <= 13)
+                local amount = isStyle and 50000 or (parseAmount(text_real.v) or 0)
                 
-            sampSendChat('/pm '..razd_player_id..' '..pm..' | Приятной игры от админа <3')
-            
-            wait(FLOOD_DELAY)
-            
-            local announce = isStyle
-                and ('WIN '..nick..'['..razd_player_id..'] стиль "'..prize..'"')
-                or  ('WIN '..nick..'['..razd_player_id..'] '..prize..' '..prettySum(amount))
-            
-            sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..announce)
-            
-            addGuiLog(getMSKTime()..' | '..announce)
-            
-            -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
-            razdLocked = false
-            active_razd = false
-            active_razd2 = false
-            antiFlood = false
-            razd_player_id = -1
-            razdachaPrefixSent = false
-            startRazdachaFlag = false
+                wait(FLOOD_DELAY)
+                
+                if statId == 7 then
+                    sampSendChat('/money '..razd_player_id..' '..amount)
+                else
+                    sampSendChat('/setstat '..razd_player_id..' '..statId..' '..amount)
+                end
+                
+                wait(FLOOD_DELAY)
+                
+                local pm = isStyle
+                    and ('Поздравляем! Вы выиграли стиль боя "'..prize..'"')
+                    or  ('Поздравляем! Вы выиграли '..prize..' '..prettySum(amount))
+                    
+                sampSendChat('/pm '..razd_player_id..' '..pm..' | Приятной игры от админа <3')
+                
+                wait(FLOOD_DELAY)
+                
+                local announce = isStyle
+                    and ('WIN '..nick..'['..razd_player_id..'] стиль "'..prize..'"')
+                    or  ('WIN '..nick..'['..razd_player_id..'] '..prize..' '..prettySum(amount))
+                
+                sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..announce)
+                
+                addGuiLog(getMSKTime()..' | '..announce)
+                
+                -- ?? ПОЛНЫЙ СБРОС ФЛАГОВ после успешной раздачи
+                resetRazdacha()
+            end
         end
     end
 end
