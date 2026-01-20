@@ -347,6 +347,12 @@ local menuColor = imgui.ImInt(0) -- 0 = Красный, 1 = Зеленый, 2 = Синий, 3 = Ора
 -- ===== Флаг для префикса раздачи =====
 local razdachaPrefixSent = false
 
+-- ===== ФЛАГИ ДЛЯ АСИНХРОННОЙ ОБРАБОТКИ =====
+local startAutoMpFlag = false
+local startAutoOtborFlag = false
+local startRazdachaFlag = false
+local saveSettingsFlag = false
+
 local function addGuiLog(text) table.insert(guiLog,1,u8:decode(text)) if #guiLog>10 then table.remove(guiLog) end end
 local function getMSKTime() return os.date('%H:%M:%S',os.time(os.date('!*t'))+MSK_OFFSET) end
 
@@ -498,8 +504,8 @@ local function loadCfg()
     f:close()
 end
 
--- ===== ФУНКЦИЯ ЗАПУСКА МЕРОПРИЯТИЯ =====
-function startAutoMP()
+-- ===== ФУНКЦИЯ ЗАПУСКА МЕРОПРИЯТИЯ (асинхронная) =====
+function doAutoMP()
     local mpName
 
     -- Определяем название мероприятия
@@ -541,29 +547,27 @@ function startAutoMP()
     -- Сбрасываем флаг префикса для MP
     mpPrefixSent = false
     
-    lua_thread.create(function()
-        -- Отправляем префикс только один раз для этой MP
-        if not mpPrefixSent then
-            sampSendChat("/a z aad")
-            mpPrefixSent = true
-            wait(1000) -- КД 1 сек
-        end
-        
-        -- Отправляем сообщения
-        sampSendChat('/aad MP | Уважаемые игроки, сейчас пройдет мероприятие "'..mpName..'"')
-        wait(1000)
-        sampSendChat('/aad MP | Приз: '..prizText)
-        wait(1000)
-        sampSendChat('/aad MP | Желающие /gomp')
-        wait(1000)
+    -- Отправляем префикс только один раз для этой MP
+    if not mpPrefixSent then
+        sampSendChat("/a z aad")
+        mpPrefixSent = true
+        wait(1000) -- КД 1 сек
+    end
+    
+    -- Отправляем сообщения
+    sampSendChat('/aad MP | Уважаемые игроки, сейчас пройдет мероприятие "'..mpName..'"')
+    wait(1000)
+    sampSendChat('/aad MP | Приз: '..prizText)
+    wait(1000)
+    sampSendChat('/aad MP | Желающие /gomp')
+    wait(1000)
 
-        mpAutoStep = 1
-        sampSendChat("/mp")
-    end)
+    mpAutoStep = 1
+    sampSendChat("/mp")
 end
 
--- ===== ФУНКЦИЯ ЗАПУСКА АВТО ОТБОРА =====
-function startAutoOtbor()
+-- ===== ФУНКЦИЯ ЗАПУСКА АВТО ОТБОРА (асинхронная) =====
+function doAutoOtbor()
     local leaderName
     
     -- Определяем название лидерки
@@ -586,27 +590,52 @@ function startAutoOtbor()
     -- Сбрасываем флаг префикса для отбора
     otborPrefixSent = false
 
-    lua_thread.create(function()
-        -- Отправляем префикс только один раз для этого отбора
-        if not otborPrefixSent then
-            sampSendChat("/a z " .. chatCmd)
-            otborPrefixSent = true
-            wait(1000) -- КД 1 сек
-        end
-        
-        -- Отправляем сообщения
-        sampSendChat('/'..chatCmd..' ОТБОР | Сейчас пройдёт отбор на лидера "'..leaderName..'"')
+    -- Отправляем префикс только один раз для этого отбора
+    if not otborPrefixSent then
+        sampSendChat("/a z " .. chatCmd)
+        otborPrefixSent = true
         wait(1000) -- КД 1 сек
+    end
+    
+    -- Отправляем сообщения
+    sampSendChat('/'..chatCmd..' ОТБОР | Сейчас пройдёт отбор на лидера "'..leaderName..'"')
+    wait(1000) -- КД 1 сек
 
-        sampSendChat('/'..chatCmd..' ОТБОР | Критерий: 2+ часов на аккаунте, иметь вк')
+    sampSendChat('/'..chatCmd..' ОТБОР | Критерий: 2+ часов на аккаунте, иметь вк')
+    wait(1000) -- КД 1 сек
+
+    sampSendChat('/'..chatCmd..' ОТБОР | Желающий /gomp')
+    wait(1000) -- КД 1 сек
+
+    otborRunning = true
+    sampSendChat("/mp")
+end
+
+-- ===== ФУНКЦИЯ ЗАПУСКА РАЗДАЧИ (асинхронная) =====
+function doRazdacha()
+    local pName = u8:decode(arr_priz[combo_priz.v + 1])
+    local isStyle = (combo_priz.v + 1 >= 11 and combo_priz.v + 1 <= 13)
+    local amount = isStyle and 50000 or (parseAmount(text_real.v) or 0)
+    local txt
+    
+    if isStyle then
+        txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — стиль \""..pName.."\""
+    else
+        txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — "..pName.." "..prettySum(amount)
+    end
+    
+    -- Отправляем префикс только один раз для этой раздачи
+    if not razdachaPrefixSent then
+        local chatCmd = arr_chat[combo_chat.v + 1]
+        sampSendChat("/a z " .. chatCmd)
+        razdachaPrefixSent = true
         wait(1000) -- КД 1 сек
-
-        sampSendChat('/'..chatCmd..' ОТБОР | Желающий /gomp')
-        wait(1000) -- КД 1 сек
-
-        otborRunning = true
-        sampSendChat("/mp")
-    end)
+    end
+    
+    sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..txt)
+    
+    -- Запускаем таймер для отслеживания ответов
+    timer = os.clock()
 end
 
 -- ===== MAIN =====
@@ -650,11 +679,43 @@ function main()
     sampAddChatMessage("{ADFF2F}Для открытия меню скрипта пропишите команду /plhelp",-1)
     sampAddChatMessage("{ADFF2F}Для использования скрипта пропишите команду /pl [id]",-1)
 
-    -- авто-сохранение при выходе
+    -- поток для авто-сохранения настроек
     lua_thread.create(function()
         while true do
             wait(5000) -- раз в 5 сек
             saveCfg() -- сохраняем всегда
+        end
+    end)
+    
+    -- поток для асинхронной обработки мероприятий
+    lua_thread.create(function()
+        while true do
+            wait(0)
+            
+            -- Обработка авто-мероприятия
+            if startAutoMpFlag then
+                startAutoMpFlag = false
+                doAutoMP()
+            end
+            
+            -- Обработка авто-отбора
+            if startAutoOtborFlag then
+                startAutoOtborFlag = false
+                doAutoOtbor()
+            end
+            
+            -- Обработка авто-раздачи
+            if startRazdachaFlag then
+                startRazdachaFlag = false
+                doRazdacha()
+            end
+            
+            -- Обработка сохранения настроек
+            if saveSettingsFlag then
+                saveSettingsFlag = false
+                saveCfg()
+                sampAddChatMessage("{33CCFF}[FastHelperAdm] Настройки сохранены", -1)
+            end
         end
     end)
 
@@ -949,8 +1010,7 @@ function imgui.OnDrawFrame()
 
         imgui.Separator()
         if imgui.Button(u8"Сохранить настройки") then
-            saveCfg()
-            sampAddChatMessage("{33CCFF}[FastHelperAdm] Настройки сохранены", -1)
+            saveSettingsFlag = true
         end
     elseif selectedTab==3 then
         imgui.Text(u8"Активные репорты:")
@@ -1090,7 +1150,7 @@ function imgui.OnDrawFrame()
 
             imgui.Separator()
             if imgui.Button(u8"Начать мероприятие", imgui.ImVec2(260, 32)) then
-                startAutoMP()
+                startAutoMpFlag = true
             end
         else
             imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
@@ -1122,25 +1182,7 @@ function imgui.OnDrawFrame()
                 active_razd=true
                 active_razd2=false
                 razdachaPrefixSent = false
-                timer=os.clock()
-                local pName=u8:decode(arr_priz[combo_priz.v+1])
-                local txt
-                
-                if isStyle then
-                    txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — стиль \""..pName.."\""
-                else
-                    txt = "РАЗДАЧА | Кто первый напишет /rep "..u8:decode(text_word.v).." — "..pName.." "..prettySum(amount)
-                end
-                
-                -- Отправляем префикс только один раз для этой раздачи
-                if not razdachaPrefixSent then
-                    local chatCmd = arr_chat[combo_chat.v + 1]
-                    sampSendChat("/a z " .. chatCmd)
-                    razdachaPrefixSent = true
-                    wait(1000) -- КД 1 сек
-                end
-                
-                sampSendChat('/'..arr_chat[combo_chat.v+1]..' '..txt)
+                startRazdachaFlag = true
             end
             
             imgui.Separator()
@@ -1179,7 +1221,7 @@ function imgui.OnDrawFrame()
 
             imgui.Separator()
             if imgui.Button(u8"Начать Отбор", imgui.ImVec2(260, 32)) then
-                startAutoOtbor()
+                startAutoOtborFlag = true
             end
         else
             imgui.TextColored(imgui.ImVec4(1,0,0,1), u8"Доступ запрещен!")
