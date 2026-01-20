@@ -7,67 +7,55 @@ script_version("1.75")
 SCRIPT_VERSION = "1.75"
 SCRIPT_VERSION = tostring(SCRIPT_VERSION)
 
+local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
+local SCRIPT_URL  = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
+local SCRIPT_PATH = thisScript().path
 local UPDATE_FLAG = getWorkingDirectory().."\\FastHelperAdm.update"
 
 -- ===== СЕКЦИЯ АВТО-ОБНОВЛЕНИЯ (УПРОЩЕННАЯ КАК В UltraFuck.lua) =====
-local VERSION_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/version.txt"
-local SCRIPT_URL = "https://raw.githubusercontent.com/TaifunTS/FastHelperAdm/main/FastHelperAdm.lua"
-local SCRIPT_PATH = thisScript().path
-
-local updateChecked = false
-
 function checkUpdate()
-    if updateChecked then return end
-    updateChecked = true
-    
-    local version_path = getWorkingDirectory().."\\FastHelperAdm.version"
-    
-    downloadUrlToFile(VERSION_URL, version_path, function(_, status)
+    local tmpVersion = getWorkingDirectory().."\\FastHelperAdm.version"
+
+    downloadUrlToFile(VERSION_URL, tmpVersion, function(_, status)
         if status ~= 58 then 
-            -- Очищаем временный файл если загрузка не удалась
-            if doesFileExist(version_path) then
-                os.remove(version_path)
+            if doesFileExist(tmpVersion) then
+                os.remove(tmpVersion)
             end
             return 
         end
-        
-        local f = io.open(version_path, "r")
+
+        local f = io.open(tmpVersion, "r")
         if not f then return end
-        
+
         local online = f:read("*a")
         f:close()
-        os.remove(version_path)
-        
-        if not online then return end
-        
-        -- ?? ОЧИСТКА ОТ \n И ПРОБЕЛОВ (ВАЖНО)
-        online = online:gsub("%s+", "")
-        
-        -- ?? СРАВНЕНИЕ СТРОК (НЕ tonumber)
-        if online ~= SCRIPT_VERSION then
-            sampAddChatMessage(string.format(
-                "{33CCFF}[FastHelperAdm] Найдено обновление v%s (у вас v%s)",
-                online,
-                SCRIPT_VERSION
-            ), -1)
-            sampAddChatMessage("{33CCFF}[FastHelperAdm] Начинаю загрузку обновления...", -1)
-            
-            -- ?? СКАЧИВАЕМ ВО ВРЕМЕННЫЙ ФАЙЛ .new
-            downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
-                if st == 58 then
-                    local f = io.open(UPDATE_FLAG, "w")
-                    if f then f:write("1") f:close() end
+        os.remove(tmpVersion)
 
-                    sampAddChatMessage("{00FF00}[FastHelperAdm] Обновление загружено. Перезапуск MoonLoader...", -1)
-                    wait(1000)
-                    sampSendChat("/reloadml")
-                else
-                    sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
-                end
-            end)
-        else
+        online = online:gsub("%s+", "")
+        if online == SCRIPT_VERSION then
             sampAddChatMessage("{00FF00}[FastHelperAdm] У вас актуальная версия v"..SCRIPT_VERSION, -1)
+            return
         end
+
+        sampAddChatMessage(
+            "{33CCFF}[FastHelperAdm] Найдено обновление v"..online.." (у вас v"..SCRIPT_VERSION..")",
+            -1
+        )
+        sampAddChatMessage("{33CCFF}[FastHelperAdm] Загрузка обновления...", -1)
+
+        downloadUrlToFile(SCRIPT_URL, SCRIPT_PATH..".new", function(_, st)
+            if st == 58 then
+                local f = io.open(UPDATE_FLAG, "w")
+                if f then f:write("1") f:close() end
+
+                sampAddChatMessage(
+                    "{00FF00}[FastHelperAdm] Обновление загружено. Перезапустите игру или MoonLoader.",
+                    -1
+                )
+            else
+                sampAddChatMessage("{FF4444}[FastHelperAdm] Ошибка загрузки обновления", -1)
+            end
+        end)
     end)
 end
 -- ===== КОНЕЦ АВТО-ОБНОВЛЕНИЯ =====
@@ -1079,10 +1067,10 @@ end
 
 -- ===== MAIN =====
 function main()
-    if doesFileExist(UPDATE_FLAG) and doesFileExist(SCRIPT_PATH..".new") then
+    if doesFileExist(UPDATE_FLAG) and doesFileExist(thisScript().path..".new") then
         os.remove(UPDATE_FLAG)
-        os.remove(SCRIPT_PATH)
-        os.rename(SCRIPT_PATH..".new", SCRIPT_PATH)
+        os.remove(thisScript().path)
+        os.rename(thisScript().path..".new", thisScript().path)
     end
     
     repeat wait(0) until isSampAvailable()
